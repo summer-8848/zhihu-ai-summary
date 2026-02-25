@@ -7,7 +7,7 @@ import {
   MarkdownParser,
   type ExtractedContent,
 } from '@zhihu-ai-summary/core';
-import { SummaryButton, SummaryPanel, ConfigModal, ConfigButton } from '@zhihu-ai-summary/ui';
+import { SummaryButton, SummaryPanel, ConfigModal, ConfigButton, toast } from '@zhihu-ai-summary/ui';
 import '@zhihu-ai-summary/ui/src/styles.css';
 import { UserscriptStorage } from './storage';
 
@@ -98,7 +98,7 @@ function addSummaryButton(
         (error) => {
           setLoading(false);
           setStreaming(false);
-          alert(error.message);
+          toast.error(error.message);
           setShowPanel(false);
         }
       );

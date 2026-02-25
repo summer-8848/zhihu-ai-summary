@@ -913,3 +913,195 @@
 .zhihu-ai-inline-body .markdown-table tr:hover {
   background: #f9f9f9;
 }
+
+/* Toast 提示框样式 */
+.zhihu-ai-toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10001;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.zhihu-ai-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px;
+  max-width: 500px;
+  padding: 14px 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  pointer-events: auto;
+  transition: all 0.3s ease;
+}
+
+.zhihu-ai-toast-show {
+  animation: zhihu-ai-toast-slide-in 0.3s ease;
+}
+
+.zhihu-ai-toast-hide {
+  animation: zhihu-ai-toast-slide-out 0.3s ease;
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+@keyframes zhihu-ai-toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes zhihu-ai-toast-slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.zhihu-ai-toast-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.zhihu-ai-toast-success .zhihu-ai-toast-icon {
+  background: #52c41a;
+  color: white;
+}
+
+.zhihu-ai-toast-error .zhihu-ai-toast-icon {
+  background: #ff4d4f;
+  color: white;
+}
+
+.zhihu-ai-toast-info .zhihu-ai-toast-icon {
+  background: #667eea;
+  color: white;
+}
+
+.zhihu-ai-toast-warning .zhihu-ai-toast-icon {
+  background: #fa8c16;
+  color: white;
+}
+
+.zhihu-ai-toast-message {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.zhihu-ai-toast-close {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 20px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.zhihu-ai-toast-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+}
+
+/* InputModal 样式 */
+.zhihu-ai-input-modal {
+  max-width: 600px;
+}
+
+.zhihu-ai-input-modal-input,
+.zhihu-ai-input-modal-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.zhihu-ai-input-modal-input:focus,
+.zhihu-ai-input-modal-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.zhihu-ai-input-modal-textarea {
+  resize: vertical;
+  min-height: 200px;
+}
+
+.zhihu-ai-input-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.zhihu-ai-input-modal-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.zhihu-ai-input-modal-btn-cancel {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.zhihu-ai-input-modal-btn-cancel:hover {
+  background: #e8e8e8;
+}
+
+.zhihu-ai-input-modal-btn-confirm {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.zhihu-ai-input-modal-btn-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.zhihu-ai-input-modal-btn-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}

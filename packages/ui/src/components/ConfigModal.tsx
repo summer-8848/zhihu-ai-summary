@@ -1,6 +1,8 @@
-import { h } from 'preact';
+import { h, Fragment } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import type { Account, ConfigManager, APIClient } from '@zhihu-ai-summary/core';
+import { toast } from './Toast';
+import { InputModal } from './InputModal';
 
 interface ConfigModalProps {
   configManager: ConfigManager;
@@ -19,6 +21,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
   const [showAccountForm, setShowAccountForm] = useState(false);
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
   const [copyingAccountId, setCopyingAccountId] = useState<string | null>(null);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   useEffect(() => {
     loadConfig();
@@ -37,9 +40,13 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
   };
 
   const handleSelectAccount = async (accountId: string) => {
+    const account = accounts.find(acc => acc.id === accountId);
     await configManager.set('CURRENT_ACCOUNT_ID', accountId);
     await apiClient.loadCurrentAccount();
     setCurrentAccountId(accountId);
+    if (account) {
+      toast.success(`已切换到账号：${account.name}`);
+    }
   };
 
   const handleDeleteAccount = async (accountId: string) => {
@@ -61,7 +68,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
   const handleSaveSettings = async () => {
     await configManager.set('AUTO_SUMMARIZE', autoSummarize);
     await configManager.set('MIN_ANSWER_LENGTH', minAnswerLength);
-    alert('设置已保存！');
+    toast.success('设置已保存！');
   };
 
   const handleExportConfig = async () => {
@@ -70,7 +77,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(configJson);
-        alert('配置已复制到剪贴板！');
+        toast.success('配置已复制到剪贴板！');
       } else {
         const textarea = document.createElement('textarea');
         textarea.value = configJson;
@@ -80,19 +87,16 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        alert('配置已复制到剪贴板！');
+        toast.success('配置已复制到剪贴板！');
       }
     } catch (error) {
       console.error('复制配置失败:', error);
-      alert('复制配置失败');
+      toast.error('复制配置失败');
     }
   };
 
-  const handleImportConfig = async () => {
+  const handleImportConfig = async (configJson: string) => {
     try {
-      const configJson = prompt('请粘贴配置JSON：');
-      if (!configJson) return;
-
       const config = JSON.parse(configJson);
 
       if (!config.AI_ACCOUNTS || !Array.isArray(config.AI_ACCOUNTS)) {
@@ -111,20 +115,21 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
         if (success) {
           await apiClient.loadCurrentAccount();
           await loadConfig();
-          alert('配置导入成功！');
+          toast.success('配置导入成功！');
         } else {
-          alert('配置导入失败');
+          toast.error('配置导入失败');
         }
       }
     } catch (error) {
       console.error('导入配置失败:', error);
-      alert('配置格式错误，请检查JSON格式是否正确');
+      toast.error('配置格式错误，请检查JSON格式是否正确');
     }
   };
 
   return (
-    <div className="zhihu-ai-modal" onClick={onClose}>
-      <div className="zhihu-ai-modal-content" onClick={(e) => e.stopPropagation()}>
+    <>
+      <div className="zhihu-ai-modal" onClick={onClose}>
+        <div className="zhihu-ai-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="zhihu-ai-modal-header">
           <div className="zhihu-ai-modal-title">
             <svg width="24" height="24" viewBox="0 0 1024 1024" fill="#667eea">
@@ -259,7 +264,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
                     </button>
                     <button
                       className="zhihu-ai-config-btn-half zhihu-ai-config-btn-warning"
-                      onClick={handleImportConfig}
+                      onClick={() => setShowImportModal(true)}
                     >
                       📥 导入配置
                     </button>
@@ -275,28 +280,43 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
           )}
         </div>
       </div>
-
-      {showAccountForm && (
-        <AccountFormModal
-          configManager={configManager}
-          apiClient={apiClient}
-          accounts={accounts}
-          editingAccountId={editingAccountId}
-          copyingAccountId={copyingAccountId}
-          onClose={() => {
-            setShowAccountForm(false);
-            setEditingAccountId(null);
-            setCopyingAccountId(null);
-          }}
-          onSave={async () => {
-            await loadConfig();
-            setShowAccountForm(false);
-            setEditingAccountId(null);
-            setCopyingAccountId(null);
-          }}
-        />
-      )}
     </div>
+
+    {showAccountForm && (
+      <AccountFormModal
+        configManager={configManager}
+        apiClient={apiClient}
+        accounts={accounts}
+        editingAccountId={editingAccountId}
+        copyingAccountId={copyingAccountId}
+        onClose={() => {
+          setShowAccountForm(false);
+          setEditingAccountId(null);
+          setCopyingAccountId(null);
+        }}
+        onSave={async () => {
+          await loadConfig();
+          setShowAccountForm(false);
+          setEditingAccountId(null);
+          setCopyingAccountId(null);
+        }}
+      />
+    )}
+
+    {showImportModal && (
+      <InputModal
+        title="导入配置"
+        placeholder="请粘贴配置 JSON..."
+        multiline={true}
+        rows={15}
+        onConfirm={(value) => {
+          setShowImportModal(false);
+          handleImportConfig(value);
+        }}
+        onCancel={() => setShowImportModal(false)}
+      />
+    )}
+  </>
   );
 }
 
@@ -352,7 +372,7 @@ function AccountFormModal({
 
   const handleSave = async () => {
     if (!formData.apiUrl || !formData.apiKey || !formData.model) {
-      alert('请填写完整的账号信息');
+      toast.warning('请填写完整的账号信息');
       return;
     }
 
