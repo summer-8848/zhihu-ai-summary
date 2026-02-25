@@ -14,10 +14,13 @@ export default defineConfig({
         description: '为知乎文章、问题和回答提供 AI 智能总结功能，支持多账号管理和自动总结',
         author: 'Summer121',
         match: ['https://*.zhihu.com/*'],
-        grant: ['GM_xmlhttpRequest', 'GM_setValue', 'GM_getValue'],
+        grant: ['GM_xmlhttpRequest', 'GM_setValue', 'GM_getValue', 'unsafeWindow'],
         license: 'MIT',
-        connect: ['*'],
+        connect: ['localhost', '*'],
         'run-at': 'document-idle',
+        // 使用 HTTP 服务器的 URL（配合 dev:userscript:serve 使用）
+        updateURL: 'http://localhost:8080/zhihu-ai-summary.user.js',
+        downloadURL: 'http://localhost:8080/zhihu-ai-summary.user.js',
       },
       build: {
         externalGlobals: {},
@@ -25,11 +28,12 @@ export default defineConfig({
       },
       server: {
         open: false,
+        mountGmApi: true,
       },
     }),
   ],
   server: {
     port: 5173,
-    host: true,
+    host: 'localhost',
   },
 });

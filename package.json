@@ -5,6 +5,8 @@
   "description": "知乎AI总结助手 - Monorepo",
   "scripts": {
     "dev:userscript": "pnpm --filter userscript dev",
+    "dev:userscript:watch": "pnpm --filter userscript dev:watch",
+    "dev:userscript:serve": "cd packages/userscript/dist && npx http-server -p 8080 --cors",
     "dev:extension": "pnpm --filter extension dev",
     "build": "pnpm -r build",
     "build:userscript": "pnpm --filter userscript build",
