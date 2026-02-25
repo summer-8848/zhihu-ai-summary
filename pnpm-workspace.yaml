@@ -1,0 +1,6 @@
+packages:
+  - 'packages/*'
+
+# UI 组件使用 Preact，体积小巧（3KB）
+# core 包提供核心逻辑
+# ui 包提供可复用的 UI 组件

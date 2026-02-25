@@ -1,0 +1,26 @@
+{
+  "name": "@zhihu-ai-summary/extension",
+  "version": "1.4.0",
+  "description": "知乎AI总结助手 - 浏览器插件版",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["zhihu", "ai", "summary", "chrome-extension"],
+  "author": "Summer121",
+  "license": "MIT",
+  "dependencies": {
+    "@zhihu-ai-summary/core": "workspace:*",
+    "@zhihu-ai-summary/ui": "workspace:*",
+    "preact": "^10.19.3"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.21",
+    "@preact/preset-vite": "^2.7.0",
+    "@types/chrome": "^0.0.254",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.0"
+  }
+}

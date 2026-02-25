@@ -1,0 +1,25 @@
+{
+  "name": "@zhihu-ai-summary/userscript",
+  "version": "1.4.0",
+  "description": "知乎AI总结助手 - 油猴脚本版",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["zhihu", "ai", "summary", "userscript", "tampermonkey"],
+  "author": "Summer121",
+  "license": "MIT",
+  "dependencies": {
+    "@zhihu-ai-summary/core": "workspace:*",
+    "@zhihu-ai-summary/ui": "workspace:*",
+    "preact": "^10.19.3"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.7.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.0",
+    "vite-plugin-monkey": "^4.0.0"
+  }
+}

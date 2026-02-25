@@ -1,0 +1,15 @@
+# idea
+.vscode
+.idea
+
+# files
+node_modules
+dist
+*.local
+pnpm-lock.yaml
+*.log
+.DS_Store
+
+# md files
+*.md
+!README.md

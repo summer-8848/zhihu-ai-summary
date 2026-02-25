@@ -1,0 +1,17 @@
+{
+  "name": "zhihu-ai-summary",
+  "version": "1.4.0",
+  "private": true,
+  "description": "知乎AI总结助手 - Monorepo",
+  "scripts": {
+    "dev:userscript": "pnpm --filter userscript dev",
+    "dev:extension": "pnpm --filter extension dev",
+    "build": "pnpm -r build",
+    "build:userscript": "pnpm --filter userscript build",
+    "build:extension": "pnpm --filter extension build",
+    "clean": "pnpm -r clean"
+  },
+  "keywords": ["zhihu", "ai", "summary", "userscript", "extension"],
+  "author": "Summer121",
+  "license": "MIT"
+}
