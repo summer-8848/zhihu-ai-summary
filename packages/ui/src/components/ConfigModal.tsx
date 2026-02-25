@@ -1,51 +1,124 @@
 import { h } from 'preact';
-import { useState } from 'preact/hooks';
-import type { Account } from '@zhihu-ai-summary/core';
+import { useState, useEffect } from 'preact/hooks';
+import type { Account, ConfigManager, APIClient } from '@zhihu-ai-summary/core';
 
 interface ConfigModalProps {
-  accounts: Account[];
-  currentAccountId: string;
-  onSave: (account: Account) => Promise<void>;
+  configManager: ConfigManager;
+  apiClient: APIClient;
   onClose: () => void;
 }
 
-export function ConfigModal({ accounts, currentAccountId, onSave, onClose }: ConfigModalProps) {
-  const currentAccount = accounts.find(acc => acc.id === currentAccountId) || accounts[0];
+type TabType = 'accounts' | 'settings';
 
-  const [formData, setFormData] = useState({
-    apiKey: currentAccount?.apiKey || '',
-    apiUrl: currentAccount?.apiUrl || 'https://api.openai.com/v1/chat/completions',
-    model: currentAccount?.model || 'gpt-4o-mini',
-  });
+export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalProps) {
+  const [activeTab, setActiveTab] = useState<TabType>('accounts');
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [currentAccountId, setCurrentAccountId] = useState<string>('');
+  const [autoSummarize, setAutoSummarize] = useState(false);
+  const [minAnswerLength, setMinAnswerLength] = useState(200);
+  const [showAccountForm, setShowAccountForm] = useState(false);
+  const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
+  const [copyingAccountId, setCopyingAccountId] = useState<string | null>(null);
 
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  useEffect(() => {
+    loadConfig();
+  }, []);
 
-  const handleSubmit = async (e: Event) => {
-    e.preventDefault();
+  const loadConfig = async () => {
+    const accs = await configManager.get('AI_ACCOUNTS', []);
+    const currentId = await configManager.get('CURRENT_ACCOUNT_ID', '');
+    const autoSum = await configManager.get('AUTO_SUMMARIZE', false);
+    const minLen = await configManager.get('MIN_ANSWER_LENGTH', 200);
 
-    if (!formData.apiKey || !formData.apiUrl || !formData.model) {
-      setMessage({ text: '请填写完整配置', type: 'error' });
-      return;
+    setAccounts(accs);
+    setCurrentAccountId(currentId);
+    setAutoSummarize(autoSum);
+    setMinAnswerLength(minLen);
+  };
+
+  const handleSelectAccount = async (accountId: string) => {
+    await configManager.set('CURRENT_ACCOUNT_ID', accountId);
+    await apiClient.loadCurrentAccount();
+    setCurrentAccountId(accountId);
+  };
+
+  const handleDeleteAccount = async (accountId: string) => {
+    if (!confirm('确定要删除这个账号吗？')) return;
+
+    const filteredAccounts = accounts.filter(acc => acc.id !== accountId);
+    await configManager.set('AI_ACCOUNTS', filteredAccounts);
+
+    if (accountId === currentAccountId) {
+      const newCurrentId = filteredAccounts[0]?.id || '';
+      await configManager.set('CURRENT_ACCOUNT_ID', newCurrentId);
+      await apiClient.loadCurrentAccount();
+      setCurrentAccountId(newCurrentId);
     }
 
-    setSaving(true);
-    try {
-      const account: Account = {
-        id: currentAccount?.id || Date.now().toString(),
-        name: '默认账号',
-        ...formData,
-      };
+    setAccounts(filteredAccounts);
+  };
 
-      await onSave(account);
-      setMessage({ text: '配置保存成功！', type: 'success' });
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+  const handleSaveSettings = async () => {
+    await configManager.set('AUTO_SUMMARIZE', autoSummarize);
+    await configManager.set('MIN_ANSWER_LENGTH', minAnswerLength);
+    alert('设置已保存！');
+  };
+
+  const handleExportConfig = async () => {
+    try {
+      const configJson = await configManager.exportConfig();
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(configJson);
+        alert('配置已复制到剪贴板！');
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = configJson;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('配置已复制到剪贴板！');
+      }
     } catch (error) {
-      setMessage({ text: '保存失败，请重试', type: 'error' });
-    } finally {
-      setSaving(false);
+      console.error('复制配置失败:', error);
+      alert('复制配置失败');
+    }
+  };
+
+  const handleImportConfig = async () => {
+    try {
+      const configJson = prompt('请粘贴配置JSON：');
+      if (!configJson) return;
+
+      const config = JSON.parse(configJson);
+
+      if (!config.AI_ACCOUNTS || !Array.isArray(config.AI_ACCOUNTS)) {
+        throw new Error('配置格式错误：缺少有效的账号列表');
+      }
+
+      for (const account of config.AI_ACCOUNTS) {
+        if (!account.id || !account.name || !account.apiUrl || !account.apiKey || !account.model) {
+          throw new Error('配置格式错误：账号信息不完整');
+        }
+      }
+
+      if (confirm('导入配置将覆盖现有设置，确定要继续吗？')) {
+        const success = await configManager.importConfig(configJson);
+
+        if (success) {
+          await apiClient.loadCurrentAccount();
+          await loadConfig();
+          alert('配置导入成功！');
+        } else {
+          alert('配置导入失败');
+        }
+      }
+    } catch (error) {
+      console.error('导入配置失败:', error);
+      alert('配置格式错误，请检查JSON格式是否正确');
     }
   };
 
@@ -53,63 +126,348 @@ export function ConfigModal({ accounts, currentAccountId, onSave, onClose }: Con
     <div className="zhihu-ai-modal" onClick={onClose}>
       <div className="zhihu-ai-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="zhihu-ai-modal-header">
-          <h2 className="zhihu-ai-modal-title">配置 AI 总结</h2>
-          <button className="zhihu-ai-icon-btn" onClick={onClose}>×</button>
+          <div className="zhihu-ai-modal-title">
+            <svg width="24" height="24" viewBox="0 0 1024 1024" fill="#667eea">
+              <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/>
+              <path d="M464 336a48 48 0 1 0 96 0 48 48 0 1 0-96 0z m72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"/>
+            </svg>
+            配置 OpenAI API
+          </div>
+          <button className="zhihu-ai-modal-close" onClick={onClose}>×</button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="zhihu-ai-form-group">
-            <label className="zhihu-ai-label">API Key</label>
-            <input
-              type="password"
-              className="zhihu-ai-input"
-              placeholder="输入 OpenAI API Key"
-              value={formData.apiKey}
-              onInput={(e) => setFormData({ ...formData, apiKey: (e.target as HTMLInputElement).value })}
-            />
-          </div>
-
-          <div className="zhihu-ai-form-group">
-            <label className="zhihu-ai-label">API URL</label>
-            <input
-              type="text"
-              className="zhihu-ai-input"
-              placeholder="https://api.openai.com/v1/chat/completions"
-              value={formData.apiUrl}
-              onInput={(e) => setFormData({ ...formData, apiUrl: (e.target as HTMLInputElement).value })}
-            />
-          </div>
-
-          <div className="zhihu-ai-form-group">
-            <label className="zhihu-ai-label">模型</label>
-            <input
-              type="text"
-              className="zhihu-ai-input"
-              placeholder="gpt-4o-mini"
-              value={formData.model}
-              onInput={(e) => setFormData({ ...formData, model: (e.target as HTMLInputElement).value })}
-            />
-          </div>
-
-          {message && (
+        <div className="zhihu-ai-modal-body">
+          <div className="zhihu-ai-tabs">
             <div
-              style={{
-                padding: '12px',
-                borderRadius: '6px',
-                marginBottom: '16px',
-                background: message.type === 'success' ? '#f6ffed' : '#fff2f0',
-                color: message.type === 'success' ? '#52c41a' : '#ff4d4f',
-                border: `1px solid ${message.type === 'success' ? '#b7eb8f' : '#ffccc7'}`,
-              }}
+              className={`zhihu-ai-tab ${activeTab === 'accounts' ? 'active' : ''}`}
+              onClick={() => setActiveTab('accounts')}
             >
-              {message.text}
+              账号管理
+            </div>
+            <div
+              className={`zhihu-ai-tab ${activeTab === 'settings' ? 'active' : ''}`}
+              onClick={() => setActiveTab('settings')}
+            >
+              基础设置
+            </div>
+          </div>
+
+          {activeTab === 'accounts' && (
+            <div className="zhihu-ai-tab-content active">
+              <div className="zhihu-ai-account-list">
+                {accounts.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: '#999' }}>
+                    暂无账号，请添加新账号
+                  </div>
+                ) : (
+                  accounts.map(account => (
+                    <div
+                      key={account.id}
+                      className={`zhihu-ai-account-item ${account.id === currentAccountId ? 'active' : ''}`}
+                      onClick={() => handleSelectAccount(account.id)}
+                    >
+                      <div className="zhihu-ai-account-info">
+                        <div className="zhihu-ai-account-name">{account.name}</div>
+                        <div className="zhihu-ai-account-detail">
+                          {account.model} • {account.apiUrl.length > 40 ? account.apiUrl.substring(0, 40) + '...' : account.apiUrl}
+                        </div>
+                      </div>
+                      <div className="zhihu-ai-account-actions">
+                        <button
+                          className="zhihu-ai-account-btn zhihu-ai-account-btn-copy"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCopyingAccountId(account.id);
+                            setShowAccountForm(true);
+                          }}
+                        >
+                          复制
+                        </button>
+                        <button
+                          className="zhihu-ai-account-btn zhihu-ai-account-btn-edit"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingAccountId(account.id);
+                            setShowAccountForm(true);
+                          }}
+                        >
+                          编辑
+                        </button>
+                        <button
+                          className="zhihu-ai-account-btn zhihu-ai-account-btn-delete"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteAccount(account.id);
+                          }}
+                        >
+                          删除
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              <button
+                className="zhihu-ai-add-account-btn"
+                onClick={() => {
+                  setEditingAccountId(null);
+                  setCopyingAccountId(null);
+                  setShowAccountForm(true);
+                }}
+              >
+                + 添加新账号
+              </button>
             </div>
           )}
 
-          <button type="submit" className="zhihu-ai-btn" disabled={saving}>
-            {saving ? '保存中...' : '保存配置'}
-          </button>
-        </form>
+          {activeTab === 'settings' && (
+            <div className="zhihu-ai-tab-content active">
+              <div className="zhihu-ai-config-panel">
+                <div className="zhihu-ai-config-item">
+                  <label className="zhihu-ai-config-label" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={autoSummarize}
+                      onChange={(e) => setAutoSummarize((e.target as HTMLInputElement).checked)}
+                      style={{ marginRight: '8px', width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                    <span>自动总结(页面加载后自动调用AI总结文章和问题中的各个回答)</span>
+                  </label>
+                </div>
+                <div className="zhihu-ai-config-item">
+                  <label className="zhihu-ai-config-label">回答最少字数:</label>
+                  <input
+                    type="number"
+                    className="zhihu-ai-config-input"
+                    value={minAnswerLength}
+                    min="0"
+                    placeholder="200"
+                    style={{ width: '100%' }}
+                    onInput={(e) => setMinAnswerLength(parseInt((e.target as HTMLInputElement).value) || 200)}
+                  />
+                  <div style={{ marginTop: '6px', fontSize: '12px', color: '#666' }}>
+                    回答字数少于此值时,不自动总结,仅显示提示信息(手动点击仍可总结)
+                  </div>
+                </div>
+                <div className="zhihu-ai-config-item">
+                  <div className="zhihu-ai-config-btn-group">
+                    <button
+                      className="zhihu-ai-config-btn-half zhihu-ai-config-btn-secondary"
+                      onClick={handleExportConfig}
+                    >
+                      📋 复制配置
+                    </button>
+                    <button
+                      className="zhihu-ai-config-btn-half zhihu-ai-config-btn-warning"
+                      onClick={handleImportConfig}
+                    >
+                      📥 导入配置
+                    </button>
+                  </div>
+                </div>
+                <div className="zhihu-ai-config-item">
+                  <button className="zhihu-ai-config-save" onClick={handleSaveSettings}>
+                    保存设置
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {showAccountForm && (
+        <AccountFormModal
+          configManager={configManager}
+          apiClient={apiClient}
+          accounts={accounts}
+          editingAccountId={editingAccountId}
+          copyingAccountId={copyingAccountId}
+          onClose={() => {
+            setShowAccountForm(false);
+            setEditingAccountId(null);
+            setCopyingAccountId(null);
+          }}
+          onSave={async () => {
+            await loadConfig();
+            setShowAccountForm(false);
+            setEditingAccountId(null);
+            setCopyingAccountId(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+interface AccountFormModalProps {
+  configManager: ConfigManager;
+  apiClient: APIClient;
+  accounts: Account[];
+  editingAccountId: string | null;
+  copyingAccountId: string | null;
+  onClose: () => void;
+  onSave: () => Promise<void>;
+}
+
+function AccountFormModal({
+  configManager,
+  apiClient,
+  accounts,
+  editingAccountId,
+  copyingAccountId,
+  onClose,
+  onSave,
+}: AccountFormModalProps) {
+  const sourceAccount = copyingAccountId
+    ? accounts.find(acc => acc.id === copyingAccountId)
+    : editingAccountId
+    ? accounts.find(acc => acc.id === editingAccountId)
+    : null;
+
+  const [formData, setFormData] = useState({
+    name: copyingAccountId && sourceAccount ? `${sourceAccount.name} (副本)` : sourceAccount?.name || '',
+    apiUrl: sourceAccount?.apiUrl || '',
+    apiKey: sourceAccount?.apiKey || '',
+    model: sourceAccount?.model || '',
+  });
+
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  const handleTest = async () => {
+    if (!formData.apiUrl || !formData.apiKey || !formData.model) {
+      setTestResult({ success: false, message: '请填写完整信息' });
+      return;
+    }
+
+    setTesting(true);
+    setTestResult(null);
+
+    const result = await apiClient.testConnection(formData.apiKey, formData.apiUrl, formData.model);
+
+    setTesting(false);
+    setTestResult(result);
+  };
+
+  const handleSave = async () => {
+    if (!formData.apiUrl || !formData.apiKey || !formData.model) {
+      alert('请填写完整的账号信息');
+      return;
+    }
+
+    const allAccounts = await configManager.get('AI_ACCOUNTS', []);
+
+    if (editingAccountId) {
+      const index = allAccounts.findIndex(acc => acc.id === editingAccountId);
+      if (index !== -1) {
+        allAccounts[index] = {
+          id: editingAccountId,
+          name: formData.name || formData.apiUrl,
+          apiUrl: formData.apiUrl,
+          apiKey: formData.apiKey,
+          model: formData.model,
+        };
+      }
+    } else {
+      const newAccount: Account = {
+        id: Date.now().toString(),
+        name: formData.name || formData.apiUrl,
+        apiUrl: formData.apiUrl,
+        apiKey: formData.apiKey,
+        model: formData.model,
+      };
+      allAccounts.push(newAccount);
+
+      if (!editingAccountId) {
+        await configManager.set('CURRENT_ACCOUNT_ID', newAccount.id);
+      }
+    }
+
+    await configManager.set('AI_ACCOUNTS', allAccounts);
+    await apiClient.loadCurrentAccount();
+    await onSave();
+  };
+
+  const title = copyingAccountId ? '复制账号' : editingAccountId ? '编辑账号' : '添加账号';
+  const saveButtonText = editingAccountId ? '保存修改' : '添加账号';
+
+  return (
+    <div className="zhihu-ai-modal" style={{ zIndex: 10001 }} onClick={onClose}>
+      <div className="zhihu-ai-modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
+        <div className="zhihu-ai-modal-header">
+          <div className="zhihu-ai-modal-title">{title}</div>
+          <button className="zhihu-ai-modal-close" onClick={onClose}>×</button>
+        </div>
+        <div className="zhihu-ai-modal-body">
+          <div className="zhihu-ai-config-panel">
+            <div className="zhihu-ai-config-item">
+              <label className="zhihu-ai-config-label">备注名称:</label>
+              <input
+                type="text"
+                className="zhihu-ai-config-input"
+                value={formData.name}
+                placeholder="默认使用API地址"
+                onInput={(e) => setFormData({ ...formData, name: (e.target as HTMLInputElement).value })}
+              />
+            </div>
+            <div className="zhihu-ai-config-item">
+              <label className="zhihu-ai-config-label">API接口地址:</label>
+              <input
+                type="text"
+                className="zhihu-ai-config-input"
+                value={formData.apiUrl}
+                placeholder="https://api.openai.com/v1/chat/completions"
+                onInput={(e) => setFormData({ ...formData, apiUrl: (e.target as HTMLInputElement).value })}
+              />
+            </div>
+            <div className="zhihu-ai-config-item">
+              <label className="zhihu-ai-config-label">API Key:</label>
+              <input
+                type="password"
+                className="zhihu-ai-config-input"
+                value={formData.apiKey}
+                placeholder="sk-..."
+                onInput={(e) => setFormData({ ...formData, apiKey: (e.target as HTMLInputElement).value })}
+              />
+            </div>
+            <div className="zhihu-ai-config-item">
+              <label className="zhihu-ai-config-label">模型名称:</label>
+              <input
+                type="text"
+                className="zhihu-ai-config-input"
+                value={formData.model}
+                placeholder="gpt-4o-mini"
+                onInput={(e) => setFormData({ ...formData, model: (e.target as HTMLInputElement).value })}
+              />
+            </div>
+            {testResult && (
+              <div className={`zhihu-ai-test-result ${testResult.success ? 'success' : 'error'}`}>
+                {testResult.success ? '✓' : '✗'} {testResult.message}
+              </div>
+            )}
+            {testing && (
+              <div className="zhihu-ai-test-result" style={{ background: '#f0f0f0', border: '1px solid #d9d9d9', color: '#666' }}>
+                正在测试连接...
+              </div>
+            )}
+            <div className="zhihu-ai-config-btn-group">
+              <button
+                className="zhihu-ai-config-btn-half zhihu-ai-config-test zhihu-ai-config-btn-secondary"
+                onClick={handleTest}
+                disabled={testing}
+              >
+                {testing ? '测试中...' : '测试连接'}
+              </button>
+              <button
+                className="zhihu-ai-config-btn-half zhihu-ai-config-save"
+                onClick={handleSave}
+              >
+                {saveButtonText}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

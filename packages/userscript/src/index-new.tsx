@@ -8,6 +8,7 @@ import {
   type ExtractedContent,
 } from '@zhihu-ai-summary/core';
 import { SummaryButton, SummaryPanel, ConfigModal, ConfigButton } from '@zhihu-ai-summary/ui';
+import '@zhihu-ai-summary/ui/src/styles.css';
 import { UserscriptStorage } from './storage';
 
 // 初始化
@@ -18,33 +19,14 @@ const apiClient = new APIClient(configManager);
 // 主应用组件
 function App() {
   const [showConfig, setShowConfig] = useState(false);
-  const [accounts, setAccounts] = useState<any[]>([]);
-  const [currentAccountId, setCurrentAccountId] = useState('');
-
-  // 加载配置
-  const loadConfig = async () => {
-    const accs = await configManager.get('AI_ACCOUNTS', []);
-    const currentId = await configManager.get('CURRENT_ACCOUNT_ID', '');
-    setAccounts(accs);
-    setCurrentAccountId(currentId);
-  };
-
-  // 保存配置
-  const handleSaveConfig = async (account: any) => {
-    await configManager.set('AI_ACCOUNTS', [account]);
-    await configManager.set('CURRENT_ACCOUNT_ID', account.id);
-    await apiClient.loadCurrentAccount();
-    await loadConfig();
-  };
 
   return (
     <div>
       <ConfigButton onClick={() => setShowConfig(true)} />
       {showConfig && (
         <ConfigModal
-          accounts={accounts}
-          currentAccountId={currentAccountId}
-          onSave={handleSaveConfig}
+          configManager={configManager}
+          apiClient={apiClient}
           onClose={() => setShowConfig(false)}
         />
       )}
@@ -64,7 +46,8 @@ function renderConfigButton() {
 function addSummaryButton(
   targetElement: Element,
   content: ExtractedContent | (() => Promise<ExtractedContent>),
-  buttonClass: string
+  buttonClass: string,
+  type: 'article' | 'question' | 'answer' = 'answer'
 ) {
   const container = document.createElement('span');
   targetElement.insertBefore(container, targetElement.firstChild);
@@ -75,6 +58,7 @@ function addSummaryButton(
     const [markdown, setMarkdown] = useState('');
     const [html, setHtml] = useState('');
     const [streaming, setStreaming] = useState(false);
+    const [sourceUrl, setSourceUrl] = useState(window.location.href);
 
     const handleClick = async () => {
       setLoading(true);
@@ -82,6 +66,18 @@ function addSummaryButton(
       setMarkdown('');
       setHtml('');
       setStreaming(true);
+
+      // 获取回答的URL（如果是回答类型）
+      if (type === 'answer') {
+        const answerItem = targetElement.closest('.ContentItem.AnswerItem');
+        if (answerItem) {
+          const metaUrls = answerItem.querySelectorAll('meta[itemprop="url"]');
+          const metaUrl = metaUrls.length > 1 ? metaUrls[1] : null;
+          if (metaUrl && (metaUrl as HTMLMetaElement).content && (metaUrl as HTMLMetaElement).content.includes('/answer/')) {
+            setSourceUrl((metaUrl as HTMLMetaElement).content);
+          }
+        }
+      }
 
       // 获取内容
       const extractedContent = typeof content === 'function' ? await content() : content;
@@ -119,6 +115,8 @@ function addSummaryButton(
         {showPanel && (
           <SummaryPanel
             content={html}
+            markdown={markdown}
+            sourceUrl={sourceUrl}
             loading={loading}
             streaming={streaming}
             onClose={() => setShowPanel(false)}
@@ -137,7 +135,7 @@ function handleArticlePage() {
   const titleActions = document.querySelector('.Post-Header .ContentItem-actions');
   if (titleActions && !titleActions.querySelector('#zhihu-ai-article-btn')) {
     const content = ContentExtractor.extractArticle();
-    addSummaryButton(titleActions, content, 'zhihu-ai-summary-btn-article');
+    addSummaryButton(titleActions, content, 'zhihu-ai-summary-btn-article', 'article');
   }
 }
 
@@ -148,7 +146,8 @@ function handleQuestionPage() {
     addSummaryButton(
       questionHeader,
       () => ContentExtractor.extractQuestion(),
-      'zhihu-ai-summary-btn-question'
+      'zhihu-ai-summary-btn-question',
+      'question'
     );
   }
 }
@@ -162,7 +161,8 @@ function handleAnswers() {
       addSummaryButton(
         actions,
         () => ContentExtractor.extractAnswer(answer),
-        'zhihu-ai-summary-btn-answer'
+        'zhihu-ai-summary-btn-answer',
+        'answer'
       );
     }
   });
