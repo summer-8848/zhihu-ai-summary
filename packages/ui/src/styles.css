@@ -97,7 +97,7 @@
 }
 
 .zhihu-ai-answer-result {
-  padding: 20px;
+  padding: 5px;
   background: white;
   overflow-y: auto;
 }
@@ -106,7 +106,6 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 14px;
   padding-bottom: 12px;
   border-bottom: 2px solid #f0f0f0;
   font-size: 15px;

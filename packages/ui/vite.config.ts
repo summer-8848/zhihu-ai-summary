@@ -10,7 +10,11 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['preact', 'preact/hooks'],
+      external: ['preact', 'preact/hooks', '@zhihu-ai-summary/core'],
+      output: {
+        preserveModules: true,
+        preserveModulesRoot: 'src',
+      },
     },
   },
 });

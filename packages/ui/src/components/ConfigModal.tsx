@@ -375,7 +375,7 @@ function AccountFormModal({
       return;
     }
 
-    const allAccounts = await configManager.get('AI_ACCOUNTS', []);
+    const allAccounts = await configManager.get('AI_ACCOUNTS', []) as Account[];
 
     if (editingAccountId) {
       const index = allAccounts.findIndex(acc => acc.id === editingAccountId);

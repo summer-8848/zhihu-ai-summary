@@ -12,8 +12,8 @@ export const STYLES = `
 .zhihu-ai-summary-btn .icon { width: 16px; height: 16px; }
 .zhihu-ai-summary-btn-question { flex-shrink: 0; align-self: flex-start; margin-top: 15px; }
 .zhihu-ai-summary-btn-answer { margin-left: 8px !important; margin-right: 0; padding: 4px 12px; font-size: 13px; border-radius: 16px; display: inline-flex; vertical-align: middle; }
-.zhihu-ai-answer-result { padding: 20px; background: white; overflow-y: auto; }
-.zhihu-ai-answer-result-header { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; font-size: 15px; font-weight: 600; color: #667eea; }
+.zhihu-ai-answer-result { padding: 5px; background: white; overflow-y: auto; }
+.zhihu-ai-answer-result-header { display: flex; align-items: center; gap: 6px; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; font-size: 15px; font-weight: 600; color: #667eea; }
 .zhihu-ai-answer-result-body { line-height: 1.8; color: #555; font-size: 14px; }
 .zhihu-ai-answer-result-close { margin-left: auto; background: none; border: none; color: #999; cursor: pointer; font-size: 20px; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s; }
 .zhihu-ai-answer-result-close:hover { background: rgba(0, 0, 0, 0.05); color: #666; }

@@ -9,7 +9,7 @@ import {
 } from '@zhihu-ai-summary/core';
 import { ConfigModal, ConfigButton, SummaryButtonWrapper } from '@zhihu-ai-summary/ui';
 import '@zhihu-ai-summary/ui/src/styles.css';
-import { ExtensionStorage } from './storage';
+import { UserscriptStorage } from './storage';
 import {
   handleArticlePage,
   handleQuestionPage,
@@ -18,7 +18,7 @@ import {
 } from '@zhihu-ai-summary/core';
 
 // 初始化
-const storage = new ExtensionStorage();
+const storage = new UserscriptStorage();
 const configManager = new ConfigManager(storage);
 const apiClient = new APIClient(configManager);
 

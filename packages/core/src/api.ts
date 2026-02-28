@@ -17,7 +17,7 @@ export class APIClient {
   }
 
   async loadCurrentAccount(): Promise<void> {
-    const accounts = await this.configManager.get('AI_ACCOUNTS', []);
+    const accounts = await this.configManager.get('AI_ACCOUNTS', []) as any[];
     const currentAccountId = await this.configManager.get('CURRENT_ACCOUNT_ID', '');
 
     if (accounts.length === 0) {
@@ -25,7 +25,7 @@ export class APIClient {
       this.apiUrl = 'https://api.openai.com/v1/chat/completions';
       this.model = 'gpt-4o-mini';
     } else {
-      const currentAccount = accounts.find((acc: any) => acc.id === currentAccountId) || accounts[0];
+      const currentAccount = accounts.find((acc: any) => acc.id === currentAccountId) || accounts[0] as any;
       if (currentAccount) {
         this.apiKey = currentAccount.apiKey;
         this.apiUrl = currentAccount.apiUrl;
@@ -40,13 +40,12 @@ export class APIClient {
 
   private generatePrompt(content: ExtractedContent): string {
     const prompts = {
-      article: `请对以下知乎文章进行总结，提取关键信息和要点：\n\n标题：${content.title}\n\n内容：${content.content.substring(0, 3000)}\n\n要求：\n- 使用清晰的分段和标题\n- 关键点用列表形式展示\n- 避免使用表格`,
-      question: `请详细总结以下知乎问题：\n\n问题：${content.title}\n\n描述：${content.content.substring(0, 3000)}\n\n请从以下方面进行总结：\n1. **核心疑问**：用1-2句话说明提问者的主要困惑或需求\n2. **背景信息**：列出问题中提到的关键背景、场景或前提条件\n3. **具体诉求**：提问者希望得到什么样的答案或建议\n\n要求：\n- 信息要具体完整，不要遗漏重要细节\n- 使用清晰的标题和列表展示\n- 避免使用表格`,
-      answer: `请基于以下知乎问题，详细分析该回答：\n\n【问题】\n标题：${content.questionTitle}\n描述：${content.questionDesc}\n\n【回答】\n作者：${content.author}\n内容：${content.content.substring(0, 3000)}\n\n请从以下方面进行分析：\n1. **核心观点**：总结回答的主要论点和结论（2-3句话）\n2. **关键论据**：列出回答中的重要依据、数据、案例或事实（至少3点）\n3. **实用建议**：如果回答中有具体建议或方法，请明确列出\n4. **价值评估**：简短评价该回答是否切题、论据是否充分、是否有实用价值（1-2句话）\n\n要求：\n- 提取的信息要具体完整，保留关键数据和细节\n- 用清晰的格式输出，使用标题和列表\n- 避免使用表格`,
+      article: `请对以下知乎文章进行总结，提取关键信息和要点：\n\n标题：${(content as any).title}\n\n内容：${content.content.substring(0, 3000)}\n\n要求：\n- 使用清晰的分段和标题\n- 关键点用列表形式展示\n- 避免使用表格`,
+      question: `请详细总结以下知乎问题：\n\n问题：${(content as any).title}\n\n描述：${content.content.substring(0, 3000)}\n\n请从以下方面进行总结：\n1. **核心疑问**：用1-2句话说明提问者的主要困惑或需求\n2. **背景信息**：列出问题中提到的关键背景、场景或前提条件\n3. **具体诉求**：提问者希望得到什么样的答案或建议\n\n要求：\n- 信息要具体完整，不要遗漏重要细节\n- 使用清晰的标题和列表展示\n- 避免使用表格`,
+      answer: `请基于以下知乎问题，详细分析该回答：\n\n【问题】\n标题：${(content as any).questionTitle}\n描述：${(content as any).questionDesc}\n\n【回答】\n作者：${(content as any).author}\n内容：${content.content.substring(0, 3000)}\n\n请从以下方面进行分析：\n1. **核心观点**：总结回答的主要论点和结论（2-3句话）\n2. **关键论据**：列出回答中的重要依据、数据、案例或事实（至少3点）\n3. **实用建议**：如果回答中有具体建议或方法，请明确列出\n4. **价值评估**：简短评价该回答是否切题、论据是否充分、是否有实用价值（1-2句话）\n\n要求：\n- 提取的信息要具体完整，保留关键数据和细节\n- 用清晰的格式输出，使用标题和列表\n- 避免使用表格`,
     };
     return prompts[content.type];
   }
-
   async testConnection(apiKey: string, apiUrl: string, model: string): Promise<APIResponse> {
     try {
       const response = await fetch(apiUrl, {

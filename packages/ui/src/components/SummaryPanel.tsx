@@ -122,7 +122,9 @@ export function SummaryPanel({
       // 延迟执行，避免频繁更新
       updateTimer = window.setTimeout(() => {
         console.log('=== ResizeObserver 触发 ===');
-        checkContentHeight(panel, answerItem);
+        if (answerItem) {
+          checkContentHeight(panel, answerItem);
+        }
       }, 150);
     };
 

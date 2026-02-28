@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     preact(),
     monkey({
-      entry: 'src/index-new.tsx',
+      entry: 'src/index.tsx',
       userscript: {
         name: '知乎AI总结助手(by Summer121)',
         namespace: 'http://tampermonkey.net/',

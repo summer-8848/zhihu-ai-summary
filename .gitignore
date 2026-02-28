@@ -10,6 +10,7 @@ pnpm-lock.yaml
 *.log
 .DS_Store
 nul
+vite.config.ts.*
 
 # md files
 *.md
