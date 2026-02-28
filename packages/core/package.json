@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf dist"
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true });\""
   },
   "keywords": ["zhihu", "ai", "summary"],
   "author": "Summer121",
