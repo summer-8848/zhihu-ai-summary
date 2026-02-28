@@ -1,4 +1,4 @@
-import { render, h } from 'preact';
+import { render } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import {
   ConfigManager,
@@ -223,7 +223,9 @@ function addSummaryButton(
 async function handleArticlePage() {
   setTimeout(async () => {
     const authorHead = document.querySelector('.AuthorInfo-head');
-    if (!authorHead || authorHead.querySelector('.zhihu-ai-summary-btn-article-container')) return;
+    if (!authorHead || authorHead.querySelector('.zhihu-ai-summary-btn-article-container')) {
+      return;
+    }
 
     const articleContainer = document.querySelector('.Post-Row-Content') ||
                            document.querySelector('.Post-Row-Content-left') ||
@@ -251,7 +253,9 @@ function handleQuestionPage() {
     const titleElements = document.querySelectorAll('.QuestionHeader-title');
     const titleElement = titleElements[1];
 
-    if (!titleElement) return;
+    if (!titleElement) {
+      return;
+    }
 
     const questionContainer = document.querySelector('.QuestionHeader') ||
                             document.querySelector('.Question-mainColumn') ||
@@ -315,7 +319,7 @@ async function handleAnswers() {
         if (!authorHead) {
           continue;
         }
-      } catch (error) {
+      } catch {
         continue;
       }
     }

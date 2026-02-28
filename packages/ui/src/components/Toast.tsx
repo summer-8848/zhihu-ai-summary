@@ -1,4 +1,4 @@
-import { h, render } from 'preact';
+import { render } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';

@@ -1,4 +1,3 @@
-import { h, Fragment } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import type { Account, ConfigManager, APIClient } from '@zhihu-ai-summary/core';
 import { toast } from './Toast';
@@ -50,7 +49,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
   };
 
   const handleDeleteAccount = async (accountId: string) => {
-    if (!confirm('确定要删除这个账号吗？')) return;
+    if (!confirm('确定要删除这个账号吗？')) {return;}
 
     const filteredAccounts = accounts.filter(acc => acc.id !== accountId);
     await configManager.set('AI_ACCOUNTS', filteredAccounts);

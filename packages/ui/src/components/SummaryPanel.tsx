@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { useState, useEffect, useRef } from 'preact/hooks';
 
 interface SummaryPanelProps {
@@ -69,11 +68,11 @@ export function SummaryPanel({
 
   // 监听流式输出状态，定期检查内容高度
   useEffect(() => {
-    if (!panelRef.current || !targetElement || panelType !== 'answer') return;
+    if (!panelRef.current || !targetElement || panelType !== 'answer') {return;}
 
     const panel = panelRef.current;
     const answerItem = targetElement.closest('.ContentItem.AnswerItem');
-    if (!answerItem) return;
+    if (!answerItem) {return;}
 
     if (streaming) {
       // 流式输出中，每500ms检查一次
@@ -101,7 +100,7 @@ export function SummaryPanel({
   }, [streaming, targetElement, panelType]);
 
   useEffect(() => {
-    if (!panelRef.current || !targetElement) return;
+    if (!panelRef.current || !targetElement) {return;}
 
     const panel = panelRef.current;
     originalParentRef.current = panel.parentElement;
@@ -113,7 +112,7 @@ export function SummaryPanel({
 
     // 更新面板高度的函数（带防抖）
     const updatePanelHeight = () => {
-      if (!answerItem || panelType !== 'answer') return;
+      if (!answerItem || panelType !== 'answer') {return;}
 
       // 清除之前的定时器
       if (updateTimer) {

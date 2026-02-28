@@ -33,7 +33,7 @@ export class MarkdownParser {
       .split('\n\n')
       .map((block) => {
         block = block.trim();
-        if (!block) return '';
+        if (!block) {return '';}
         if (
           block.startsWith('<h') ||
           block.startsWith('<ul>') ||
@@ -55,15 +55,15 @@ export class MarkdownParser {
     const tableRegex = /(\|.+\|[\r\n]+\|[\s\-:]+\|[\r\n]+(?:\|.+\|[\r\n]*)+)/g;
     return html.replace(tableRegex, (match) => {
       const rows = match.trim().split('\n').filter((row) => row.trim());
-      if (rows.length < 2) return match;
+      if (rows.length < 2) {return match;}
 
       const headers = rows[0].split('|').map((h) => h.trim()).filter((h) => h);
       const alignments = rows[1]
         .split('|')
         .map((s) => {
           s = s.trim();
-          if (s.startsWith(':') && s.endsWith(':')) return 'center';
-          if (s.endsWith(':')) return 'right';
+          if (s.startsWith(':') && s.endsWith(':')) {return 'center';}
+          if (s.endsWith(':')) {return 'right';}
           return 'left';
         })
         .filter((_, i) => i < headers.length);
@@ -97,13 +97,13 @@ export class MarkdownParser {
       const line = lines[i];
       const nextLine = lines[i + 1];
 
-      if (/^[\-\*]\s+(.+)/.test(line)) {
+      if (/^[-*]\s+(.+)/.test(line)) {
         if (!inUnorderedList) {
           processedLines.push('<ul>');
           inUnorderedList = true;
         }
-        processedLines.push(line.replace(/^[\-\*]\s+(.+)/, '<li>$1</li>'));
-        if (!nextLine || !/^[\-\*]\s+/.test(nextLine)) {
+        processedLines.push(line.replace(/^[-*]\s+(.+)/, '<li>$1</li>'));
+        if (!nextLine || !/^[-*]\s+/.test(nextLine)) {
           processedLines.push('</ul>');
           inUnorderedList = false;
         }

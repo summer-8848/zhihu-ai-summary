@@ -1,5 +1,5 @@
-import { h } from 'preact';
 import { useState } from 'preact/hooks';
+
 
 interface InputModalProps {
   title: string;

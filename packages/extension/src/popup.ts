@@ -7,7 +7,7 @@ const configManager = new ConfigManager(storage);
 // 初始化 popup 页面
 async function initPopup() {
   const app = document.getElementById('app');
-  if (!app) return;
+  if (!app) {return;}
 
   const accounts = await configManager.get('AI_ACCOUNTS', []);
   const currentAccountId = await configManager.get('CURRENT_ACCOUNT_ID', '');
@@ -88,7 +88,7 @@ async function initPopup() {
 
 function showMessage(text: string, type: 'success' | 'error') {
   const message = document.getElementById('message');
-  if (!message) return;
+  if (!message) {return;}
 
   message.textContent = text;
   message.style.display = 'block';

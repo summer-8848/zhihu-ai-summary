@@ -1,4 +1,4 @@
-import { h } from 'preact';
+// No imports needed with JSX transform
 
 interface ConfigButtonProps {
   onClick: () => void;

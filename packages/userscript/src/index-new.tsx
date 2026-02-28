@@ -1,4 +1,4 @@
-import { render, h } from 'preact';
+import { render } from 'preact';
 import { useState } from 'preact/hooks';
 import {
   ConfigManager,
