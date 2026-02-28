@@ -183,8 +183,9 @@ export function SummaryPanel({
       }
     } else if (panelType === 'article') {
       // 对于文章，找到文章容器
-      const articleContainer = document.querySelector('.Post-Row-Content') ||
-                             document.querySelector('.Post-Row-Content-left') ||
+      // 优先使用正文左侧内容列作为定位基准，保证面板贴在正文右边
+      const articleContainer = document.querySelector('.Post-Row-Content-left') ||
+                             document.querySelector('.Post-Row-Content') ||
                              targetElement.closest('article') ||
                              targetElement.closest('.Post-Main');
       if (articleContainer) {
@@ -194,7 +195,6 @@ export function SummaryPanel({
           elem.style.position = 'relative';
         }
         panel.style.top = '0';
-        panel.style.left = '67%';
       }
     }
 

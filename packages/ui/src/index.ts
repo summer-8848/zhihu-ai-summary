@@ -9,4 +9,4 @@ export type { ToastType } from './components/Toast';
 export type { SummaryButtonWrapperProps } from './components/SummaryButtonWrapper';
 
 // 导出样式
-import './styles/index.css';
+import './styles.css';
