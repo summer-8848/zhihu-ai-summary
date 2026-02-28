@@ -4,9 +4,6 @@ export interface StorageAdapter {
   set<T>(key: string, value: T): Promise<void>;
 }
 
-// 配置键类型
-export type ConfigKey = 'AI_ACCOUNTS' | 'CURRENT_ACCOUNT_ID' | 'AUTO_SUMMARIZE' | 'MIN_ANSWER_LENGTH';
-
 // 账号配置
 export interface Account {
   id: string;
@@ -16,22 +13,39 @@ export interface Account {
   model: string;
 }
 
+// 配置键到值的映射（用于强类型 get/set）
+export interface ConfigValueMap {
+  AI_ACCOUNTS: Account[];
+  CURRENT_ACCOUNT_ID: string;
+  AUTO_SUMMARIZE: boolean;
+  MIN_ANSWER_LENGTH: number;
+}
+
+export type ConfigKey = keyof ConfigValueMap;
+
+type BatchDefaults<K extends ConfigKey> = { [P in K]: ConfigValueMap[P] };
+
 // 配置管理器
 export class ConfigManager {
   constructor(private storage: StorageAdapter) {}
 
-  async get<T>(key: ConfigKey, defaultValue?: T): Promise<T> {
+  async get<K extends ConfigKey>(key: K, defaultValue: ConfigValueMap[K]): Promise<ConfigValueMap[K]>;
+  async get<K extends ConfigKey>(key: K, defaultValue?: ConfigValueMap[K]): Promise<ConfigValueMap[K] | undefined>;
+  async get<K extends ConfigKey>(
+    key: K,
+    defaultValue?: ConfigValueMap[K]
+  ): Promise<ConfigValueMap[K] | undefined> {
     try {
-      return await this.storage.get(key, defaultValue);
+      return await this.storage.get<ConfigValueMap[K]>(key, defaultValue);
     } catch (error) {
       console.warn(`配置获取失败 [${key}]:`, error);
-      return defaultValue as T;
+      return defaultValue;
     }
   }
 
-  async set<T>(key: ConfigKey, value: T): Promise<boolean> {
+  async set<K extends ConfigKey>(key: K, value: ConfigValueMap[K]): Promise<boolean> {
     try {
-      await this.storage.set(key, value);
+      await this.storage.set<ConfigValueMap[K]>(key, value);
       return true;
     } catch (error) {
       console.error(`配置设置失败 [${key}]:`, error);
@@ -39,35 +53,43 @@ export class ConfigManager {
     }
   }
 
-  async getBatch(configs: Record<ConfigKey, any>): Promise<Record<string, any>> {
-    const results: Record<string, any> = {};
-    for (const [key, defaultValue] of Object.entries(configs)) {
-      results[key] = await this.get(key as ConfigKey, defaultValue);
+  // 批量获取：传入 key->默认值 的对象，返回同 key 的结果对象
+  async getBatch<K extends ConfigKey>(configs: BatchDefaults<K>): Promise<BatchDefaults<K>> {
+    const results = {} as BatchDefaults<K>;
+    for (const key of Object.keys(configs) as K[]) {
+      results[key] = await this.get(key, configs[key]);
     }
     return results;
   }
 
-  async setBatch(configs: Record<ConfigKey, any>): Promise<Record<string, boolean>> {
-    const results: Record<string, boolean> = {};
-    for (const [key, value] of Object.entries(configs)) {
-      results[key] = await this.set(key as ConfigKey, value);
+  // 批量设置：传入部分配置，返回每个 key 是否设置成功
+  async setBatch<K extends ConfigKey>(
+    configs: Partial<Pick<ConfigValueMap, K>>
+  ): Promise<Partial<Record<K, boolean>>> {
+    const results: Partial<Record<K, boolean>> = {};
+    for (const key of Object.keys(configs) as K[]) {
+      const value = configs[key];
+      if (value === undefined) {
+        continue;
+      }
+      results[key] = await this.set(key, value as ConfigValueMap[K]);
     }
     return results;
   }
 
   async exportConfig(): Promise<string> {
-    const configs = {
-      AI_ACCOUNTS: await this.get('AI_ACCOUNTS', []),
-      CURRENT_ACCOUNT_ID: await this.get('CURRENT_ACCOUNT_ID', ''),
-      AUTO_SUMMARIZE: await this.get('AUTO_SUMMARIZE', false),
-      MIN_ANSWER_LENGTH: await this.get('MIN_ANSWER_LENGTH', 200),
+    const configs: ConfigValueMap = {
+      AI_ACCOUNTS: (await this.get('AI_ACCOUNTS', [])) ?? [],
+      CURRENT_ACCOUNT_ID: (await this.get('CURRENT_ACCOUNT_ID', '')) ?? '',
+      AUTO_SUMMARIZE: (await this.get('AUTO_SUMMARIZE', false)) ?? false,
+      MIN_ANSWER_LENGTH: (await this.get('MIN_ANSWER_LENGTH', 200)) ?? 200,
     };
     return JSON.stringify(configs, null, 2);
   }
 
   async importConfig(configJson: string): Promise<boolean> {
     try {
-      const configs = JSON.parse(configJson);
+      const configs = JSON.parse(configJson) as Partial<ConfigValueMap>;
       await this.setBatch(configs);
       return true;
     } catch (error) {
@@ -77,9 +99,9 @@ export class ConfigManager {
   }
 
   async clearAll(): Promise<void> {
-    const keys: ConfigKey[] = ['AI_ACCOUNTS', 'CURRENT_ACCOUNT_ID', 'AUTO_SUMMARIZE', 'MIN_ANSWER_LENGTH'];
-    for (const key of keys) {
-      await this.set(key, null as any);
-    }
+    await this.set('AI_ACCOUNTS', []);
+    await this.set('CURRENT_ACCOUNT_ID', '');
+    await this.set('AUTO_SUMMARIZE', false);
+    await this.set('MIN_ANSWER_LENGTH', 200);
   }
 }

@@ -1,5 +1,9 @@
 import { useState, useEffect, useRef } from 'preact/hooks';
 
+interface PanelElement extends HTMLDivElement {
+  __cleanup?: () => void;
+}
+
 interface SummaryPanelProps {
   content: string;
   markdown?: string;
@@ -26,7 +30,7 @@ export function SummaryPanel({
   targetElement
 }: SummaryPanelProps) {
   const [copied, setCopied] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<PanelElement>(null);
   const originalParentRef = useRef<Element | null>(null);
   const contentCheckIntervalRef = useRef<number | null>(null);
 
@@ -175,7 +179,7 @@ export function SummaryPanel({
         };
 
         // 保存清理函数
-        (panel as any).__cleanup = cleanup;
+        panel.__cleanup = cleanup;
       }
     } else if (panelType === 'article') {
       // 对于文章，找到文章容器
@@ -202,9 +206,9 @@ export function SummaryPanel({
     // 清理函数：组件卸载时移除面板和观察器
     return () => {
       // 清理观察器
-      if ((panel as any).__cleanup) {
-        (panel as any).__cleanup();
-        delete (panel as any).__cleanup;
+      if (panel.__cleanup) {
+        panel.__cleanup();
+        delete panel.__cleanup;
       }
 
       // 移除面板

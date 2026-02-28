@@ -34,7 +34,26 @@ export function SummaryButtonWrapper({
   const [sourceUrl, setSourceUrl] = useState(window.location.href);
   const [modelName, setModelName] = useState('AI');
 
+  const hideSideColumn = () => {
+    if (type !== 'answer') {
+      return () => {};
+    }
+    const sideColumn = document.querySelector(
+      'div.Question-sideColumn.Question-sideColumn--sticky'
+    ) as HTMLElement | null;
+    if (!sideColumn) {
+      return () => {};
+    }
+
+    const prevDisplay = sideColumn.style.display;
+    sideColumn.style.display = 'none';
+    return () => {
+      sideColumn.style.display = prevDisplay;
+    };
+  };
+
   const handleClick = async (isManualClick: boolean = true) => {
+    const restoreSideColumn = hideSideColumn();
     // 关闭已存在的面板
     setShowPanel(false);
     setMarkdown('');
@@ -45,7 +64,7 @@ export function SummaryButtonWrapper({
     setStreaming(true);
 
     // 获取模型名称
-    const model = (apiClient as any).model || 'AI';
+    const model = apiClient.modelName || 'AI';
     setModelName(model);
 
     // 获取回答的URL（如果是回答类型）
@@ -99,11 +118,13 @@ export function SummaryButtonWrapper({
           setHtml(MarkdownParser.parse(fullText));
           setLoading(false);
           setStreaming(false);
+          restoreSideColumn();
         },
         (error) => {
           setHtml(`<div class="zhihu-ai-inline-error">${error.message}</div>`);
           setLoading(false);
           setStreaming(false);
+          restoreSideColumn();
         }
       );
     } catch (error) {
@@ -111,6 +132,7 @@ export function SummaryButtonWrapper({
       setHtml(`<div class="zhihu-ai-inline-error">${error instanceof Error ? error.message : '生成总结失败'}</div>`);
       setLoading(false);
       setStreaming(false);
+      restoreSideColumn();
     }
   };
 

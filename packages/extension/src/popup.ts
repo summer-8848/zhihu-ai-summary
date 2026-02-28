@@ -1,4 +1,4 @@
-import { ConfigManager } from '@zhihu-ai-summary/core';
+import { ConfigManager, Account } from '@zhihu-ai-summary/core';
 import { ExtensionStorage } from './storage';
 
 const storage = new ExtensionStorage();
@@ -9,8 +9,8 @@ async function initPopup() {
   const app = document.getElementById('app');
   if (!app) {return;}
 
-  const accounts = await configManager.get('AI_ACCOUNTS', []);
-  const currentAccountId = await configManager.get('CURRENT_ACCOUNT_ID', '');
+  const accounts = (await configManager.get('AI_ACCOUNTS', [])) ?? [];
+  const currentAccountId = (await configManager.get('CURRENT_ACCOUNT_ID', '')) ?? '';
 
   app.innerHTML = `
     <div style="width: 400px; padding: 20px; font-family: sans-serif;">
@@ -51,7 +51,7 @@ async function initPopup() {
 
   // 加载当前配置
   if (accounts.length > 0) {
-    const currentAccount = accounts.find((acc: any) => acc.id === currentAccountId) || accounts[0];
+    const currentAccount = accounts.find((acc) => acc.id === currentAccountId) || accounts[0];
     if (currentAccount) {
       (document.getElementById('apiKey') as HTMLInputElement).value = currentAccount.apiKey;
       (document.getElementById('apiUrl') as HTMLInputElement).value = currentAccount.apiUrl;
@@ -71,7 +71,7 @@ async function initPopup() {
     }
 
     const accountId = Date.now().toString();
-    const newAccount = {
+    const newAccount: Account = {
       id: accountId,
       name: '默认账号',
       apiKey,
