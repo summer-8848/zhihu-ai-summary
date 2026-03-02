@@ -1,9 +1,10 @@
 import { render } from 'preact';
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import {
   ConfigManager,
   APIClient,
   ContentExtractor,
+  type Account,
   type ExtractedContent,
   type AddSummaryButtonOptions,
 } from '@zhihu-ai-summary/core';
@@ -25,10 +26,23 @@ const apiClient = new APIClient(configManager);
 // 主应用组件
 function App() {
   const [showConfig, setShowConfig] = useState(false);
+  const [autoHideConfigBtn, setAutoHideConfigBtn] = useState(false);
+
+  useEffect(() => {
+    const checkConfigured = async () => {
+      const accounts = (await configManager.get('AI_ACCOUNTS', [])) ?? [];
+      const hasConfigured = accounts.some(
+        (acc: Account) => Boolean(acc.apiKey?.trim()) && Boolean(acc.apiUrl?.trim()) && Boolean(acc.model?.trim())
+      );
+      setAutoHideConfigBtn(hasConfigured);
+    };
+
+    checkConfigured();
+  }, []);
 
   return (
     <div>
-      <ConfigButton onClick={() => setShowConfig(true)} />
+      <ConfigButton autoHide={autoHideConfigBtn} onClick={() => setShowConfig(true)} />
       {showConfig && (
         <ConfigModal
           configManager={configManager}

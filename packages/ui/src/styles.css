@@ -11,7 +11,7 @@
   position: absolute;
   top: 0;
   left: 100%;
-  margin-left: 10px;
+  margin-left: 25px;
   width: 400px;
   z-index: 1000;
   background: white;
@@ -354,8 +354,8 @@
 }
 
 .zhihu-ai-config-btn {
-  position: fixed;
-  bottom: 60px;
+  position: absolute;
+  bottom: 8px;
   right: 10px;
   width: 40px;
   height: 40px;
@@ -372,6 +372,29 @@
 
 .zhihu-ai-config-btn:hover {
   transform: scale(1.1);
+}
+
+/* 右下角配置按钮：已配置时贴边隐藏，悬浮到右侧区域再展开 */
+.zhihu-ai-config-btn-wrapper {
+  position: fixed;
+  bottom: 60px;
+  right: 0;
+  z-index: 9999;
+  /* 扩大悬浮触发区域，方便靠近时触发 */
+  width: 72px;
+  height: 56px;
+}
+
+.zhihu-ai-config-btn-wrapper.auto-hide .zhihu-ai-config-btn {
+  right: 0;
+  transform: translateX(28px);
+  opacity: 0.55;
+}
+
+.zhihu-ai-config-btn-wrapper.auto-hide:hover .zhihu-ai-config-btn,
+.zhihu-ai-config-btn-wrapper.auto-hide:focus-within .zhihu-ai-config-btn {
+  transform: translateX(0);
+  opacity: 1;
 }
 
 .zhihu-ai-config-panel {
