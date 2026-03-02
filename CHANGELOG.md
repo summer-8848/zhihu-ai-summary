@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.1.2](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.1.1...v2.1.2) (2026-03-02)
+
+
+### Bug Fixes
+
+* 修复 Release 工作流打包扩展的步骤顺序和路径 ([b9d834c](https://github.com/summer-8848/zhihu-ai-summary/commit/b9d834ca2dceecb66ce5bd2b07614389c970f91b))
+
 ## [2.1.1](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.1.0...v2.1.1) (2026-03-02)
 
 

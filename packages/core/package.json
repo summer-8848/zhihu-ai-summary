@@ -1,6 +1,6 @@
 {
   "name": "@zhihu-ai-summary/core",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "知乎AI总结助手 - 核心代码",
   "type": "module",
   "main": "./src/index.ts",

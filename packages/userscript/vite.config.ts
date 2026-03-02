@@ -10,7 +10,7 @@ export default defineConfig({
       userscript: {
         name: '知乎AI总结助手 - 油猴脚本版(by Summer121)',
         namespace: 'http://tampermonkey.net/',
-        version: '2.1.1',
+        version: '2.1.2',
         description: '知乎中的文章、问题和回答提供 AI 智能总结功能',
         author: 'Summer121',
         match: ['https://*.zhihu.com/*'],

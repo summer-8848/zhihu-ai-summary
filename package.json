@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "zhihu-ai-summary",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "private": true,
   "description": "知乎中的文章、问题和回答提供 AI 智能总结功能",
   "scripts": {
