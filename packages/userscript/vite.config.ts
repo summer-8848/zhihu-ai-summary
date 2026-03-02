@@ -8,10 +8,10 @@ export default defineConfig({
     monkey({
       entry: 'src/index.tsx',
       userscript: {
-        name: '知乎AI总结助手(by Summer121)',
+        name: '知乎AI总结助手 - 油猴脚本版(by Summer121)',
         namespace: 'http://tampermonkey.net/',
-        version: '1.4.0',
-        description: '为知乎文章、问题和回答提供 AI 智能总结功能，支持多账号管理和自动总结',
+        version: '2.0.0',
+        description: '知乎中的文章、问题和回答提供 AI 智能总结功能',
         author: 'Summer121',
         match: ['https://*.zhihu.com/*'],
         grant: ['GM_xmlhttpRequest', 'GM_setValue', 'GM_getValue', 'unsafeWindow'],

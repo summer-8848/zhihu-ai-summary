@@ -1,14 +1,24 @@
 {
   "manifest_version": 3,
-  "name": "知乎AI总结助手(by Summer121)",
+  "name": "知乎AI总结助手 - 浏览器插件版(by Summer121)",
   "version": "2.0.0",
-  "description": "为知乎文章、问题和回答提供 AI 智能总结功能，支持多账号管理和自动总结",
-  "permissions": ["storage", "activeTab"],
-  "host_permissions": ["https://*.zhihu.com/*", "http://localhost:5173/*"],
+  "description": "为知乎中的文章、问题和回答提供 AI 智能总结功能",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://*.zhihu.com/*",
+    "http://localhost:5173/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://*.zhihu.com/*"],
-      "js": ["src/content.tsx"],
+      "matches": [
+        "https://*.zhihu.com/*"
+      ],
+      "js": [
+        "src/content.tsx"
+      ],
       "run_at": "document_idle"
     }
   ],

@@ -12,10 +12,17 @@
     "build": "tsc",
     "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true });\""
   },
-  "keywords": ["zhihu", "ai", "summary"],
+  "keywords": [
+    "zhihu",
+    "ai",
+    "summary"
+  ],
   "author": "Summer121",
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.3.3"
-  }
+  },
+  "homepage": "https://github.com/summer-8848/zhihu-ai-summary",
+  "repository": "https://github.com/summer-8848/zhihu-ai-summary",
+  "bugs": "https://github.com/summer-8848/zhihu-ai-summary/issues"
 }

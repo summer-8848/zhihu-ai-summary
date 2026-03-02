@@ -1,8 +1,9 @@
 {
+  "type": "module",
   "name": "zhihu-ai-summary",
   "version": "2.0.0",
   "private": true,
-  "description": "知乎AI总结助手 - Monorepo",
+  "description": "知乎中的文章、问题和回答提供 AI 智能总结功能",
   "scripts": {
     "dev:userscript": "pnpm --filter userscript dev",
     "dev:userscript:watch": "pnpm --filter userscript dev:watch",
@@ -12,6 +13,8 @@
     "build:userscript": "pnpm --filter userscript build",
     "build:extension": "pnpm --filter extension build",
     "clean": "pnpm -r clean",
+    "release": "commit-and-tag-version",
+    "release:dry": "commit-and-tag-version --dry-run",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
@@ -28,10 +31,14 @@
     "@eslint/js": "^10.0.1",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
+    "commit-and-tag-version": "^12.6.1",
     "eslint": "^10.0.2",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.3.0"
-  }
+  },
+  "homepage": "https://github.com/summer-8848/zhihu-ai-summary",
+  "repository": "https://github.com/summer-8848/zhihu-ai-summary",
+  "bugs": "https://github.com/summer-8848/zhihu-ai-summary/issues"
 }

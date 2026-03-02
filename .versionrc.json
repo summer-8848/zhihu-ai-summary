@@ -1,0 +1,27 @@
+{
+  "packageFiles": [
+    "package.json",
+    "packages/core/package.json",
+    "packages/ui/package.json",
+    "packages/extension/package.json",
+    "packages/userscript/package.json"
+  ],
+  "bumpFiles": [
+    "package.json",
+    "packages/core/package.json",
+    "packages/ui/package.json",
+    "packages/extension/package.json",
+    "packages/userscript/package.json",
+    {
+      "filename": "packages/extension/manifest.json",
+      "updater": "scripts/updaters/manifest-updater.cjs"
+    },
+    {
+      "filename": "packages/userscript/vite.config.ts",
+      "updater": "scripts/updaters/vite-config-updater.cjs"
+    }
+  ],
+  "skip": {
+    "tag": false
+  }
+}
