@@ -40,45 +40,76 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
   };
 
   const handleSelectAccount = async (accountId: string) => {
-    const account = accounts.find(acc => acc.id === accountId);
-    await configManager.set('CURRENT_ACCOUNT_ID', accountId);
-    await apiClient.loadCurrentAccount();
-    setCurrentAccountId(accountId);
-    if (account) {
-      toast.success(`已切换到账号：${account.name}`);
+    try {
+      const account = accounts.find(acc => acc.id === accountId);
+      const ok = await configManager.set('CURRENT_ACCOUNT_ID', accountId);
+      if (!ok) {
+        toast.error('切换账号失败：配置保存失败');
+        return;
+      }
+      await apiClient.loadCurrentAccount();
+      setCurrentAccountId(accountId);
+      if (account) {
+        toast.success(`已切换到账号：${account.name}`);
+      }
+    } catch (error) {
+      console.error('切换账号失败:', error);
+      toast.error('切换账号失败');
     }
   };
 
   const handleDeleteAccount = async (accountId: string) => {
-    const ok = await confirm({
-      title: '删除账号',
-      message: '确定要删除这个账号吗？',
-      confirmText: '删除',
-      cancelText: '取消',
-      danger: true,
-    });
+    try {
+      const ok = await confirm({
+        title: '删除账号',
+        message: '确定要删除这个账号吗？',
+        confirmText: '删除',
+        cancelText: '取消',
+        danger: true,
+      });
 
-    if (!ok) {
-      return;
+      if (!ok) {
+        return;
+      }
+
+      const filteredAccounts = accounts.filter(acc => acc.id !== accountId);
+      const saved = await configManager.set('AI_ACCOUNTS', filteredAccounts);
+      if (!saved) {
+        toast.error('删除账号失败：配置保存失败');
+        return;
+      }
+
+      if (accountId === currentAccountId) {
+        const newCurrentId = filteredAccounts[0]?.id || '';
+        const savedCurrent = await configManager.set('CURRENT_ACCOUNT_ID', newCurrentId);
+        if (!savedCurrent) {
+          toast.error('删除账号成功，但切换默认账号失败');
+        }
+        await apiClient.loadCurrentAccount();
+        setCurrentAccountId(newCurrentId);
+      }
+
+      setAccounts(filteredAccounts);
+      toast.success('账号已删除');
+    } catch (error) {
+      console.error('删除账号失败:', error);
+      toast.error('删除账号失败');
     }
-
-    const filteredAccounts = accounts.filter(acc => acc.id !== accountId);
-    await configManager.set('AI_ACCOUNTS', filteredAccounts);
-
-    if (accountId === currentAccountId) {
-      const newCurrentId = filteredAccounts[0]?.id || '';
-      await configManager.set('CURRENT_ACCOUNT_ID', newCurrentId);
-      await apiClient.loadCurrentAccount();
-      setCurrentAccountId(newCurrentId);
-    }
-
-    setAccounts(filteredAccounts);
   };
 
   const handleSaveSettings = async () => {
-    await configManager.set('AUTO_SUMMARIZE', autoSummarize);
-    await configManager.set('MIN_ANSWER_LENGTH', minAnswerLength);
-    toast.success('设置已保存！');
+    try {
+      const ok1 = await configManager.set('AUTO_SUMMARIZE', autoSummarize);
+      const ok2 = await configManager.set('MIN_ANSWER_LENGTH', minAnswerLength);
+      if (!ok1 || !ok2) {
+        toast.error('设置保存失败');
+        return;
+      }
+      toast.success('设置已保存！');
+    } catch (error) {
+      console.error('设置保存失败:', error);
+      toast.error('设置保存失败');
+    }
   };
 
   const handleExportConfig = async () => {

@@ -79,10 +79,19 @@ async function initPopup() {
       model,
     };
 
-    await configManager.set('AI_ACCOUNTS', [newAccount]);
-    await configManager.set('CURRENT_ACCOUNT_ID', accountId);
+    try {
+      const ok1 = await configManager.set('AI_ACCOUNTS', [newAccount]);
+      const ok2 = await configManager.set('CURRENT_ACCOUNT_ID', accountId);
+      if (!ok1 || !ok2) {
+        showMessage('保存配置失败，请重试', 'error');
+        return;
+      }
 
-    showMessage('配置保存成功！', 'success');
+      showMessage('配置保存成功！', 'success');
+    } catch (error) {
+      console.error('保存配置失败:', error);
+      showMessage('保存配置失败，请重试', 'error');
+    }
   });
 }
 

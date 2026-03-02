@@ -8,7 +8,7 @@ import {
   type ExtractedContent,
   type AddSummaryButtonOptions,
 } from '@zhihu-ai-summary/core';
-import { ConfigModal, ConfigButton, SummaryButtonWrapper } from '@zhihu-ai-summary/ui';
+import { ConfigModal, ConfigButton, SummaryButtonWrapper, toast } from '@zhihu-ai-summary/ui';
 import '@zhihu-ai-summary/ui/src/styles.css';
 import { UserscriptStorage } from './storage';
 import {
@@ -30,11 +30,16 @@ function App() {
 
   useEffect(() => {
     const checkConfigured = async () => {
-      const accounts = (await configManager.get('AI_ACCOUNTS', [])) ?? [];
-      const hasConfigured = accounts.some(
-        (acc: Account) => Boolean(acc.apiKey?.trim()) && Boolean(acc.apiUrl?.trim()) && Boolean(acc.model?.trim())
-      );
-      setAutoHideConfigBtn(hasConfigured);
+      try {
+        const accounts = (await configManager.get('AI_ACCOUNTS', [])) ?? [];
+        const hasConfigured = accounts.some(
+          (acc: Account) => Boolean(acc.apiKey?.trim()) && Boolean(acc.apiUrl?.trim()) && Boolean(acc.model?.trim())
+        );
+        setAutoHideConfigBtn(hasConfigured);
+      } catch (error) {
+        console.error('加载配置失败:', error);
+        toast.error('加载配置失败，请刷新页面重试');
+      }
     };
 
     checkConfigured();

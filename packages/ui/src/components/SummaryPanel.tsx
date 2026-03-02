@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'preact/hooks';
+import { toast } from './Toast';
 
 interface PanelElement extends HTMLDivElement {
   __cleanup?: () => void;
@@ -52,20 +53,12 @@ export function SummaryPanel({
     // 获取面板内容的实际高度
     const panelContentHeight = panel.scrollHeight;
 
-    console.log('=== 内容高度检查 ===');
-    console.log('回答高度:', elementHeight);
-    console.log('面板内容高度:', panelContentHeight);
-    console.log('目标高度:', targetHeight);
-
     // 设置最大高度
     panel.style.maxHeight = `${targetHeight}px`;
 
-    // 根据内容是否超出来决定是否显示滚动条
     if (panelContentHeight > targetHeight) {
-      console.log('内容超出，显示滚动条');
       panel.style.overflowY = 'auto';
     } else {
-      console.log('内容未超出，隐藏滚动条');
       panel.style.overflowY = 'hidden';
     }
   };
@@ -79,15 +72,11 @@ export function SummaryPanel({
     if (!answerItem) {return;}
 
     if (streaming) {
-      // 流式输出中，每500ms检查一次
-      console.log('开始定期检查内容高度');
       contentCheckIntervalRef.current = window.setInterval(() => {
         checkContentHeight(panel, answerItem);
       }, 500);
     } else {
-      // 流式输出结束，清除定时器，做最后一次检查
       if (contentCheckIntervalRef.current) {
-        console.log('停止定期检查');
         clearInterval(contentCheckIntervalRef.current);
         contentCheckIntervalRef.current = null;
       }
@@ -125,7 +114,6 @@ export function SummaryPanel({
 
       // 延迟执行，避免频繁更新
       updateTimer = window.setTimeout(() => {
-        console.log('=== ResizeObserver 触发 ===');
         if (answerItem) {
           checkContentHeight(panel, answerItem);
         }
@@ -230,8 +218,10 @@ export function SummaryPanel({
       await navigator.clipboard.writeText(copyText);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
+      toast.success('已复制到剪贴板');
     } catch (err) {
       console.error('复制失败:', err);
+      toast.error('复制失败，请检查浏览器剪贴板权限');
     }
   };
 
@@ -239,13 +229,14 @@ export function SummaryPanel({
     <div ref={panelRef} className={`zhihu-ai-side-panel ${className}`}>
       <div className="zhihu-ai-answer-result">
         <div className="zhihu-ai-answer-result-header">
-          <svg viewBox="0 0 1024 1024" fill="currentColor" width="18" height="18">
+          <svg viewBox="0 0 1024 1024" fill="currentColor" width="18" height="18" aria-hidden="true">
             <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/>
             <path d="M464 336a48 48 0 1 0 96 0 48 48 0 1 0-96 0z m72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"/>
           </svg>
           <span className="zhihu-ai-result-title">{title}</span>
           <div className="zhihu-ai-result-actions">
             <button
+              type="button"
               className="zhihu-ai-result-copy"
               onClick={handleCopy}
               title={copied ? '已复制' : streaming ? '请等待AI总结完成后再复制' : '复制Markdown格式'}
@@ -254,6 +245,7 @@ export function SummaryPanel({
               {copied ? '✅' : '📋'}
             </button>
             <button
+              type="button"
               className="zhihu-ai-answer-result-close"
               onClick={onClose}
               title="关闭"

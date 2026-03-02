@@ -2,6 +2,7 @@ import { useState, useEffect } from 'preact/hooks';
 import { MarkdownParser, type APIClient, type ExtractedContent } from '@zhihu-ai-summary/core';
 import { SummaryButton } from './SummaryButton';
 import { SummaryPanel } from './SummaryPanel';
+import { toast } from './Toast';
 
 export interface SummaryButtonWrapperProps {
   content: ExtractedContent | (() => Promise<ExtractedContent>);
@@ -122,6 +123,9 @@ export function SummaryButtonWrapper({
         },
         (error) => {
           setHtml(`<div class="zhihu-ai-inline-error">${error.message}</div>`);
+          if (isManualClick) {
+            toast.error(error.message || '生成总结失败');
+          }
           setLoading(false);
           setStreaming(false);
           restoreSideColumn();
@@ -129,7 +133,11 @@ export function SummaryButtonWrapper({
       );
     } catch (error) {
       console.error('生成总结失败:', error);
-      setHtml(`<div class="zhihu-ai-inline-error">${error instanceof Error ? error.message : '生成总结失败'}</div>`);
+      const message = error instanceof Error ? error.message : '生成总结失败';
+      setHtml(`<div class="zhihu-ai-inline-error">${message}</div>`);
+      if (isManualClick) {
+        toast.error(message);
+      }
       setLoading(false);
       setStreaming(false);
       restoreSideColumn();
