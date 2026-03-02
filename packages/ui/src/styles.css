@@ -1,6 +1,26 @@
 :root {
-  --zhihu-ai-primary-color: #667eea;
-  --zhihu-ai-secondary-color: #764ba2;
+  /* Theme: Zhihu blue */
+  --zhihu-ai-primary-color: #1772f6;
+  --zhihu-ai-primary-hover-color: #145fd9;
+  --zhihu-ai-primary-active-color: #104cbc;
+  --zhihu-ai-secondary-color: #145fd9;
+
+  --zhihu-ai-primary-shadow-color: rgba(23, 114, 246, 0.35);
+  --zhihu-ai-primary-shadow-hover-color: rgba(23, 114, 246, 0.45);
+  --zhihu-ai-primary-soft-bg: rgba(23, 114, 246, 0.08);
+  --zhihu-ai-primary-soft-bg-2: rgba(20, 95, 217, 0.08);
+  --zhihu-ai-primary-border-color: rgba(23, 114, 246, 0.35);
+
+  --zhihu-ai-primary-gradient: linear-gradient(
+    135deg,
+    var(--zhihu-ai-primary-color) 0%,
+    var(--zhihu-ai-primary-hover-color) 100%
+  );
+  --zhihu-ai-primary-gradient-soft: linear-gradient(
+    135deg,
+    var(--zhihu-ai-primary-soft-bg) 0%,
+    var(--zhihu-ai-primary-soft-bg-2) 100%
+  );
 }
 
 .Question-sideColumn--sticky {
@@ -52,7 +72,7 @@
   gap: 6px;
   padding: 4px 10px;
   margin-right: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--zhihu-ai-primary-gradient);
   color: white;
   border: none;
   border-radius: 20px;
@@ -60,13 +80,13 @@
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(23, 114, 246, 0.3);
   flex-shrink: 0;
 }
 
 .zhihu-ai-summary-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px var(--zhihu-ai-primary-shadow-hover-color);
 }
 
 .zhihu-ai-summary-btn:active {
@@ -113,7 +133,7 @@
   border-bottom: 2px solid #f0f0f0;
   font-size: 15px;
   font-weight: 600;
-  color: #667eea;
+  color: var(--zhihu-ai-primary-color);
 }
 
 .zhihu-ai-answer-result-header svg {
@@ -181,10 +201,10 @@
 .zhihu-ai-article-result {
   margin: 24px 0;
   padding: 20px 24px;
-  background: linear-gradient(135deg, #667eea12 0%, #764ba212 100%);
-  border-left: 4px solid #667eea;
+  background: var(--zhihu-ai-primary-gradient-soft);
+  border-left: 4px solid var(--zhihu-ai-primary-color);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 2px 8px rgba(23, 114, 246, 0.1);
   animation: slideDown 0.3s ease;
 }
 
@@ -195,7 +215,7 @@
   margin-bottom: 14px;
   font-size: 16px;
   font-weight: 600;
-  color: #667eea;
+  color: var(--zhihu-ai-primary-color);
 }
 
 .zhihu-ai-article-result-header svg {
@@ -345,7 +365,7 @@
 
 .zhihu-ai-spinner {
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #667eea;
+  border-top: 3px solid var(--zhihu-ai-primary-color);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -376,13 +396,13 @@
   right: 10px;
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--zhihu-ai-primary-gradient);
   color: white;
   border: none;
   border-radius: 50%;
   cursor: pointer;
   font-size: 24px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px var(--zhihu-ai-primary-shadow-hover-color);
   z-index: 9999;
   transition: all 0.3s ease;
 }
@@ -440,13 +460,13 @@
 
 .zhihu-ai-config-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--zhihu-ai-primary-color);
 }
 
 .zhihu-ai-config-save {
   width: 100%;
   padding: 10px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--zhihu-ai-primary-gradient);
   color: white;
   border: none;
   border-radius: 6px;
@@ -458,7 +478,7 @@
 
 .zhihu-ai-config-save:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px var(--zhihu-ai-primary-shadow-hover-color);
 }
 
 .zhihu-ai-config-test {
@@ -533,8 +553,8 @@
 }
 
 .zhihu-ai-account-item.active {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+  border-color: var(--zhihu-ai-primary-color);
+  background: var(--zhihu-ai-primary-gradient-soft);
 }
 
 .zhihu-ai-account-info {
@@ -606,8 +626,8 @@
 }
 
 .zhihu-ai-add-account-btn:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: var(--zhihu-ai-primary-color);
+  color: var(--zhihu-ai-primary-color);
 }
 
 .zhihu-ai-config-btn-group {
@@ -619,7 +639,7 @@
 .zhihu-ai-config-btn-half {
   flex: 1;
   padding: 10px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--zhihu-ai-primary-gradient);
   color: white;
   border: none;
   border-radius: 6px;
@@ -631,7 +651,7 @@
 
 .zhihu-ai-config-btn-half:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px var(--zhihu-ai-primary-shadow-hover-color);
 }
 
 .zhihu-ai-config-btn-secondary {
@@ -667,8 +687,8 @@
 }
 
 .zhihu-ai-tab.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
+  color: var(--zhihu-ai-primary-color);
+  border-bottom-color: var(--zhihu-ai-primary-color);
   font-weight: 600;
 }
 
@@ -687,10 +707,10 @@
 .zhihu-ai-inline-result {
   margin: 20px 0;
   padding: 20px;
-  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-  border-left: 4px solid #667eea;
+  background: var(--zhihu-ai-primary-gradient-soft);
+  border-left: 4px solid var(--zhihu-ai-primary-color);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 2px 8px rgba(23, 114, 246, 0.1);
   animation: slideDown 0.3s ease;
 }
 
@@ -712,7 +732,7 @@
   margin-bottom: 12px;
   font-size: 16px;
   font-weight: 600;
-  color: #667eea;
+  color: var(--zhihu-ai-primary-color);
 }
 
 .zhihu-ai-inline-header svg {
@@ -736,7 +756,7 @@
 
 .zhihu-ai-inline-spinner {
   border: 2px solid #f3f3f3;
-  border-top: 2px solid #667eea;
+  border-top: 2px solid var(--zhihu-ai-primary-color);
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -776,7 +796,7 @@
   display: inline-block;
   width: 2px;
   height: 1em;
-  background: #667eea;
+  background: var(--zhihu-ai-primary-color);
   margin-left: 2px;
   animation: blink 1s infinite;
   vertical-align: text-bottom;
@@ -901,17 +921,17 @@
 .zhihu-ai-answer-result-body a,
 .zhihu-ai-article-result-body a,
 .zhihu-ai-inline-body a {
-  color: #667eea;
+    color: var(--zhihu-ai-primary-color);
   text-decoration: none;
-  border-bottom: 1px solid #667eea50;
+    border-bottom: 1px solid rgba(23, 114, 246, 0.3);
   transition: all 0.2s;
 }
 
 .zhihu-ai-answer-result-body a:hover,
 .zhihu-ai-article-result-body a:hover,
 .zhihu-ai-inline-body a:hover {
-  color: #764ba2;
-  border-bottom-color: #764ba2;
+    color: var(--zhihu-ai-primary-hover-color);
+    border-bottom-color: var(--zhihu-ai-primary-hover-color);
 }
 
 .zhihu-ai-answer-result-body .markdown-table,
@@ -930,11 +950,11 @@
 .zhihu-ai-answer-result-body .markdown-table th,
 .zhihu-ai-article-result-body .markdown-table th,
 .zhihu-ai-inline-body .markdown-table th {
-  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    background: var(--zhihu-ai-primary-gradient-soft);
   color: #333;
   font-weight: 600;
   padding: 10px 12px;
-  border-bottom: 2px solid #667eea;
+    border-bottom: 2px solid var(--zhihu-ai-primary-color);
 }
 
 .zhihu-ai-answer-result-body .markdown-table td,
@@ -1121,13 +1141,13 @@
 }
 
 .zhihu-ai-confirm-modal-btn-confirm {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--zhihu-ai-primary-gradient);
   color: white;
 }
 
 .zhihu-ai-confirm-modal-btn-confirm:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px var(--zhihu-ai-primary-shadow-hover-color);
 }
 
 .zhihu-ai-confirm-modal-btn-danger {
@@ -1155,8 +1175,8 @@
 .zhihu-ai-input-modal-input:focus,
 .zhihu-ai-input-modal-textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+  border-color: var(--zhihu-ai-primary-color);
+  box-shadow: 0 0 0 2px rgba(23, 114, 246, 0.15);
 }
 
 .zhihu-ai-input-modal-textarea {
@@ -1191,13 +1211,13 @@
 }
 
 .zhihu-ai-input-modal-btn-confirm {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--zhihu-ai-primary-gradient);
   color: white;
 }
 
 .zhihu-ai-input-modal-btn-confirm:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px var(--zhihu-ai-primary-shadow-hover-color);
 }
 
 .zhihu-ai-input-modal-btn-confirm:disabled {

@@ -14,7 +14,7 @@ async function initPopup() {
 
   app.innerHTML = `
     <div style="width: 400px; padding: 20px; font-family: sans-serif;">
-      <h2 style="margin: 0 0 20px 0; color: #667eea;">知乎AI总结助手</h2>
+      <h2 style="margin: 0 0 20px 0; color: #1772f6;">知乎AI总结助手</h2>
 
       <div style="margin-bottom: 20px;">
         <p style="color: #666; font-size: 14px;">
@@ -40,7 +40,7 @@ async function initPopup() {
           style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" />
       </div>
 
-      <button id="saveBtn" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      <button id="saveBtn" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #1772f6 0%, #145fd9 100%);
         color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 500;">
         保存配置
       </button>
