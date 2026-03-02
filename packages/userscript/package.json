@@ -1,6 +1,6 @@
 {
   "name": "@zhihu-ai-summary/userscript",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "知乎AI总结助手 - 油猴脚本版",
   "type": "module",
   "scripts": {
