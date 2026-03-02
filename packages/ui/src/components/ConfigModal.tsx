@@ -2,6 +2,7 @@ import { useState, useEffect } from 'preact/hooks';
 import type { Account, ConfigManager, APIClient } from '@zhihu-ai-summary/core';
 import { toast } from './Toast';
 import { InputModal } from './InputModal';
+import { confirm } from './ConfirmModal';
 
 interface ConfigModalProps {
   configManager: ConfigManager;
@@ -49,7 +50,17 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
   };
 
   const handleDeleteAccount = async (accountId: string) => {
-    if (!confirm('确定要删除这个账号吗？')) {return;}
+    const ok = await confirm({
+      title: '删除账号',
+      message: '确定要删除这个账号吗？',
+      confirmText: '删除',
+      cancelText: '取消',
+      danger: true,
+    });
+
+    if (!ok) {
+      return;
+    }
 
     const filteredAccounts = accounts.filter(acc => acc.id !== accountId);
     await configManager.set('AI_ACCOUNTS', filteredAccounts);
@@ -108,7 +119,15 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
         }
       }
 
-      if (confirm('导入配置将覆盖现有设置，确定要继续吗？')) {
+      const ok = await confirm({
+        title: '导入配置',
+        message: '导入配置将覆盖现有设置，确定要继续吗？',
+        confirmText: '继续导入',
+        cancelText: '取消',
+        danger: true,
+      });
+
+      if (ok) {
         const success = await configManager.importConfig(configJson);
 
         if (success) {

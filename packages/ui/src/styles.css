@@ -245,6 +245,20 @@
   animation: fadeIn 0.3s ease;
 }
 
+/* Modal overlay button (for a11y + lint) */
+.zhihu-ai-modal-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  z-index: 0;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -264,6 +278,9 @@
   overflow-y: auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.3s ease;
+  /* Ensure modal content sits above the overlay button */
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes slideUp {
@@ -1063,6 +1080,64 @@
 /* InputModal 样式 */
 .zhihu-ai-input-modal {
   max-width: 600px;
+}
+
+/* ConfirmModal 样式 */
+.zhihu-ai-confirm-modal {
+  max-width: 520px;
+}
+
+.zhihu-ai-confirm-modal-message {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.zhihu-ai-confirm-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+  justify-content: flex-end;
+}
+
+.zhihu-ai-confirm-modal-btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.zhihu-ai-confirm-modal-btn-cancel {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.zhihu-ai-confirm-modal-btn-cancel:hover {
+  background: #e8e8e8;
+}
+
+.zhihu-ai-confirm-modal-btn-confirm {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.zhihu-ai-confirm-modal-btn-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.zhihu-ai-confirm-modal-btn-danger {
+  background: linear-gradient(135deg, #ff4d4f 0%, #d9363e 100%);
+  color: white;
+}
+
+.zhihu-ai-confirm-modal-btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.35);
 }
 
 .zhihu-ai-input-modal-input,
