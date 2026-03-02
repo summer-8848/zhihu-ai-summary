@@ -39,41 +39,38 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
+      - name: Package extension as ZIP
+        run: |
+          cd packages/extension/dist
+          zip -r ../../../extension.zip .
+          cd ../../../
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ steps.get_version.outputs.VERSION }}
+          name: Release ${{ steps.get_version.outputs.VERSION }}
           body: |
-            ## ${{ steps.get_version.outputs.VERSION }}
+            ## 版本 ${{ steps.get_version.outputs.VERSION }}
             
             查看 [CHANGELOG.md](https://github.com/summer-8848/zhihu-ai-summary/blob/main/CHANGELOG.md) 了解详细更新内容。
             
-            ### 下载
+            ### 📦 下载方式
             
-            - **油猴脚本**: 在下方 Assets 中下载 `zhihu-ai-summary.user.js`
-            - **浏览器扩展**: 在下方 Assets 中下载 `extension.zip`
+            #### 油猴脚本
+            点击下方 Assets 中的 `zhihu-ai-summary.user.js` 文件，会自动提示安装到油猴扩展中。
+            
+            #### 浏览器扩展
+            1. 下载下方 Assets 中的 `extension.zip` 文件
+            2. 解压到本地文件夹
+            3. 打开 Chrome 扩展管理页面 (chrome://extensions/)
+            4. 开启"开发者模式"
+            5. 点击"加载已解压的扩展程序"，选择解压后的文件夹
           files: |
             packages/userscript/dist/*.user.js
-            packages/extension/dist/
+            extension.zip
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Package extension
+      - name: Summary
         run: |
-          cd packages/extension/dist
-          zip -r ../../extension.zip .
-          cd ../..
-
-      - name: Upload userscript to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: packages/userscript/dist/*.user.js
-
-      - name: Upload extension to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: extension.zip
-
-      - name: Update Git stats for GreasyFork
-        run: |
-          echo "ℹ️  版本 ${{ steps.get_version.outputs.VERSION }} 已发布"
+          echo "✅ 版本 ${{ steps.get_version.outputs.VERSION }} 已发布到 GitHub Release"
           echo "📦 记得同步更新 GreasyFork: https://greasyfork.org/zh-CN/scripts/559782"
