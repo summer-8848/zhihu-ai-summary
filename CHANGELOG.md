@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.1.1](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.1.0...v2.1.1) (2026-03-02)
+
+
+### Bug Fixes
+
+* 修复正则表达式中的引号转义问题 ([eccc60f](https://github.com/summer-8848/zhihu-ai-summary/commit/eccc60f1424fd48e8ccaa6ec8cd5fa126021082a))
+
 ## [2.1.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.0.0...v2.1.0) (2026-03-02)
 
 
