@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm build
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## ${{ steps.get_version.outputs.VERSION }}
+            
+            查看 [CHANGELOG.md](https://github.com/summer-8848/zhihu-ai-summary/blob/main/CHANGELOG.md) 了解详细更新内容。
+            
+            ### 下载
+            
+            - **油猴脚本**: 在下方 Assets 中下载 `zhihu-ai-summary.user.js`
+            - **浏览器扩展**: 在下方 Assets 中下载 `extension.zip`
+          files: |
+            packages/userscript/dist/*.user.js
+            packages/extension/dist/
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package extension
+        run: |
+          cd packages/extension/dist
+          zip -r ../../extension.zip .
+          cd ../..
+
+      - name: Upload userscript to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packages/userscript/dist/*.user.js
+
+      - name: Upload extension to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: extension.zip
+
+      - name: Update Git stats for GreasyFork
+        run: |
+          echo "ℹ️  版本 ${{ steps.get_version.outputs.VERSION }} 已发布"
+          echo "📦 记得同步更新 GreasyFork: https://greasyfork.org/zh-CN/scripts/559782"
