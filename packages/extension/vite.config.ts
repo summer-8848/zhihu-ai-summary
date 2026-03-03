@@ -3,6 +3,17 @@ import { crx } from '@crxjs/vite-plugin';
 import preact from '@preact/preset-vite';
 import manifest from './manifest.json';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+
+// 从根目录 package.json 读取版本号
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const rootPackageJson = JSON.parse(
+  readFileSync(resolve(__dirname, '../../package.json'), 'utf-8')
+);
+const version = rootPackageJson.version;
+const author = rootPackageJson.author;
+const homepage = rootPackageJson.homepage;
 
 const r = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 const packagesDir = r('..');
@@ -53,5 +64,11 @@ export default defineConfig({
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
     },
+  },
+  define: {
+    'import.meta.env.VITE_APP_NAME': JSON.stringify('知乎AI总结助手 - 浏览器插件版'),
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(version),
+    'import.meta.env.VITE_APP_AUTHOR': JSON.stringify(author),
+    'import.meta.env.VITE_APP_HOMEPAGE': JSON.stringify(homepage),
   },
 });

@@ -13,6 +13,12 @@ interface ConfigModalProps {
 type TabType = 'accounts' | 'settings';
 
 export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalProps) {
+  // 从环境变量获取平台信息
+  const appName = import.meta.env.VITE_APP_NAME;
+  const version = import.meta.env.VITE_APP_VERSION;
+  const author = import.meta.env.VITE_APP_AUTHOR;
+  const homepage = import.meta.env.VITE_APP_HOMEPAGE;
+  
   const [activeTab, setActiveTab] = useState<TabType>('accounts');
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [currentAccountId, setCurrentAccountId] = useState<string>('');
@@ -185,7 +191,28 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
               <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/>
               <path d="M464 336a48 48 0 1 0 96 0 48 48 0 1 0-96 0z m72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"/>
             </svg>
-            配置 OpenAI API
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <div style={{ fontSize: '16px', fontWeight: 600, color: '#1a1a1a' }}>
+                {appName}
+              </div>
+              <div style={{ fontSize: '12px', color: '#8a8a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>作者: {author}</span>
+                <span>•</span>
+                <a
+                  href={homepage}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ 
+                    color: '#1772f6', 
+                    textDecoration: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  v{version}
+                </a>
+              </div>
+            </div>
           </div>
           <button className="zhihu-ai-modal-close" onClick={onClose}>×</button>
         </div>
