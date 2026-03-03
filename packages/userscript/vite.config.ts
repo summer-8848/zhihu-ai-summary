@@ -42,6 +42,17 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    // Default Vite minification is fine; explicitly keep sourcemaps off.
+    sourcemap: false,
+    minify: 'esbuild',
+    target: 'es2020',
+  },
+  esbuild: {
+    // Keep the published userscript small.
+    drop: ['console', 'debugger'],
+    legalComments: 'none',
+  },
   server: {
     port: 5173,
     host: 'localhost',

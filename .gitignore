@@ -9,7 +9,7 @@ dist
 *.log
 .DS_Store
 nul
-vite.config.ts.*
+vite.config.ts.timestamp-*.mjs
 
 # md files
 *.md

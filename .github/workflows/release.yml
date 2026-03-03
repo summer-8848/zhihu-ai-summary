@@ -42,7 +42,13 @@ jobs:
       - name: Package extension as ZIP
         run: |
           cd packages/extension/dist
-          zip -r ../../../extension.zip .
+          # Best compression + exclude dev/build-only files
+          zip -r -9 ../../../extension.zip . \
+            -x "*.map" \
+            -x ".vite/*" \
+            -x "**/.vite/*" \
+            -x "**/.DS_Store" \
+            -x "__MACOSX/*"
           cd ../../../
 
       - name: Create GitHub Release

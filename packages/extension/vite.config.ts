@@ -38,11 +38,20 @@ export default defineConfig({
     ],
   },
   build: {
+    // Release artifacts should be small; keep source maps off by default.
+    sourcemap: false,
+    minify: 'esbuild',
+    target: 'es2020',
     rollupOptions: {
       input: {
         popup: 'popup.html',
       },
     },
+  },
+  esbuild: {
+    // Reduce bundle a bit further by dropping console/debugger in production build.
+    drop: ['console', 'debugger'],
+    legalComments: 'none',
   },
   server: {
     port: 5173,
