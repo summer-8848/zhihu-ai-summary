@@ -1,6 +1,6 @@
 {
   "name": "@zhihu-ai-summary/ui",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "知乎AI总结助手 - UI 组件",
   "type": "module",
   "main": "./dist/index.js",

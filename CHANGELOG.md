@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.2.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.1.2...v2.2.0) (2026-03-03)
+
+
+### Features
+
+* 修改配置面板标题 ([562c1f3](https://github.com/summer-8848/zhihu-ai-summary/commit/562c1f3a0ffd3f24bf3b423c84f05c156ac34f44))
+
+
+### Bug Fixes
+
+* 修复eslint版本不兼容 ([ba1a543](https://github.com/summer-8848/zhihu-ai-summary/commit/ba1a54327f7301e68091820a23d74915a7133013))
+
 ## [2.1.2](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.1.1...v2.1.2) (2026-03-02)
 
 
