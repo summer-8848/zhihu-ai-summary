@@ -11,6 +11,7 @@ export default [
       '**/dist/**',
       '**/*.config.js',
       '**/*.config.ts',
+      '**/vite.config.ts.timestamp-*.mjs',
     ],
   },
 

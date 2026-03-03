@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite';
 import monkey from 'vite-plugin-monkey';
 import preact from '@preact/preset-vite';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // 从根目录 package.json 读取版本号
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootPackageJson = JSON.parse(
   readFileSync(resolve(__dirname, '../../package.json'), 'utf-8')
 );
