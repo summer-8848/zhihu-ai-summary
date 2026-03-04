@@ -31,9 +31,139 @@ export function SummaryPanel({
   targetElement
 }: SummaryPanelProps) {
   const [copied, setCopied] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const panelRef = useRef<PanelElement>(null);
   const originalParentRef = useRef<Element | null>(null);
   const contentCheckIntervalRef = useRef<number | null>(null);
+  const dragOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const dragStateRef = useRef<{
+    dragging: boolean;
+    pointerId: number | null;
+    startX: number;
+    startY: number;
+    baseX: number;
+    baseY: number;
+    startRect: { left: number; top: number; width: number; height: number } | null;
+    prevBodyUserSelect: string;
+  }>({
+    dragging: false,
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    baseX: 0,
+    baseY: 0,
+    startRect: null,
+    prevBodyUserSelect: '',
+  });
+
+  const applyDragTransform = (x: number, y: number) => {
+    const panel = panelRef.current;
+    if (!panel) {
+      return;
+    }
+    panel.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  };
+
+  const endDrag = () => {
+    const state = dragStateRef.current;
+    if (!state.dragging) {
+      return;
+    }
+
+    state.dragging = false;
+    state.pointerId = null;
+    state.startRect = null;
+    window.removeEventListener('pointermove', handlePointerMove);
+    window.removeEventListener('pointerup', handlePointerUp);
+    window.removeEventListener('pointercancel', handlePointerUp);
+
+    document.body.style.userSelect = state.prevBodyUserSelect;
+    setDragging(false);
+  };
+
+  const clamp = (value: number, min: number, max: number) => {
+    return Math.min(max, Math.max(min, value));
+  };
+
+  const handlePointerMove = (event: PointerEvent) => {
+    const state = dragStateRef.current;
+    if (!state.dragging || state.pointerId === null || event.pointerId !== state.pointerId) {
+      return;
+    }
+    if (!state.startRect) {
+      return;
+    }
+
+    const dx = event.clientX - state.startX;
+    const dy = event.clientY - state.startY;
+
+    // 允许拖动，但避免把面板完全拖出屏幕（保留一小块可见区域，便于找回）
+    const visibleMarginX = 80;
+    const visibleMarginY = 60;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const rect = state.startRect;
+
+    const deltaXMin = (visibleMarginX - rect.width) - rect.left;
+    const deltaXMax = (vw - visibleMarginX) - rect.left;
+    const deltaYMin = (visibleMarginY - rect.height) - rect.top;
+    const deltaYMax = (vh - visibleMarginY) - rect.top;
+
+    const clampedDx = clamp(dx, deltaXMin, deltaXMax);
+    const clampedDy = clamp(dy, deltaYMin, deltaYMax);
+
+    const nextX = state.baseX + clampedDx;
+    const nextY = state.baseY + clampedDy;
+
+    dragOffsetRef.current = { x: nextX, y: nextY };
+    applyDragTransform(nextX, nextY);
+  };
+
+  const handlePointerUp = (event: PointerEvent) => {
+    const state = dragStateRef.current;
+    if (!state.dragging || state.pointerId === null || event.pointerId !== state.pointerId) {
+      return;
+    }
+    endDrag();
+  };
+
+  const handleHeaderPointerDown = (event: PointerEvent) => {
+    // 点击关闭/复制按钮时不触发拖动
+    const target = event.target as Element | null;
+    if (target?.closest('button')) {
+      return;
+    }
+
+    const panel = panelRef.current;
+    if (!panel) {
+      return;
+    }
+
+    const header = event.currentTarget as HTMLElement;
+    dragStateRef.current.dragging = true;
+    dragStateRef.current.pointerId = event.pointerId;
+    dragStateRef.current.startX = event.clientX;
+    dragStateRef.current.startY = event.clientY;
+    dragStateRef.current.baseX = dragOffsetRef.current.x;
+    dragStateRef.current.baseY = dragOffsetRef.current.y;
+
+    const rect = panel.getBoundingClientRect();
+    dragStateRef.current.startRect = {
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
+    };
+
+    dragStateRef.current.prevBodyUserSelect = document.body.style.userSelect;
+    document.body.style.userSelect = 'none';
+
+    header.setPointerCapture(event.pointerId);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+    setDragging(true);
+  };
 
   // 检查内容高度并调整滚动条
   const checkContentHeight = (panel: HTMLDivElement, answerItem: Element) => {
@@ -193,6 +323,9 @@ export function SummaryPanel({
 
     // 清理函数：组件卸载时移除面板和观察器
     return () => {
+      // 清理拖动监听器（如果正在拖动）
+      endDrag();
+
       // 清理观察器
       if (panel.__cleanup) {
         panel.__cleanup();
@@ -205,6 +338,14 @@ export function SummaryPanel({
       }
     };
   }, [panelType, targetElement]);
+
+  useEffect(() => {
+    // 初始化 transform，避免浏览器计算差异导致首次拖动跳变
+    applyDragTransform(dragOffsetRef.current.x, dragOffsetRef.current.y);
+    return () => {
+      endDrag();
+    };
+  }, []);
 
   const handleCopy = async () => {
     try {
@@ -226,9 +367,16 @@ export function SummaryPanel({
   };
 
   return (
-    <div ref={panelRef} className={`zhihu-ai-side-panel ${className}`}>
+    <div
+      ref={panelRef}
+      className={`zhihu-ai-side-panel ${className} ${dragging ? 'zhihu-ai-side-panel--dragging' : ''}`}
+    >
       <div className="zhihu-ai-answer-result">
-        <div className="zhihu-ai-answer-result-header">
+        <div
+          className="zhihu-ai-answer-result-header zhihu-ai-draggable-header"
+          onPointerDown={handleHeaderPointerDown}
+          title="按住拖动面板"
+        >
           <svg viewBox="0 0 1024 1024" fill="currentColor" width="18" height="18" aria-hidden="true">
             <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/>
             <path d="M464 336a48 48 0 1 0 96 0 48 48 0 1 0-96 0z m72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"/>

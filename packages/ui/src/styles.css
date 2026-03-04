@@ -39,6 +39,16 @@
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
   transition: opacity 0.3s ease;
   box-sizing: border-box;
+  will-change: transform;
+}
+
+.zhihu-ai-side-panel--dragging {
+  cursor: grabbing;
+}
+
+.zhihu-ai-draggable-header {
+  cursor: grab;
+  user-select: none;
 }
 
 .zhihu-ai-side-panel.short {
