@@ -87,30 +87,74 @@ export function handleQuestionPage(
   addSummaryButton: AddSummaryButtonFn,
   extractQuestionFn: () => Promise<ExtractedContent>
 ) {
-  setTimeout(() => {
-    const titleElements = document.querySelectorAll('.QuestionHeader-title');
-    const titleElement = titleElements[1];
+  // 问题页 DOM 经常异步加载：等待标题出现后再插入按钮
+  void (async () => {
+    try {
+      const titleSelector = 'h1.QuestionHeader-title, .QuestionHeader-title';
 
-    if (!titleElement) {
-      return;
-    }
+      const isVisible = (el: Element) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) {
+          return false;
+        }
+        const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+          return false;
+        }
+        return true;
+      };
 
-    const questionContainer = document.querySelector('.QuestionHeader') ||
-                            document.querySelector('.Question-mainColumn') ||
-                            titleElement.closest('.QuestionHeader-content');
+      // 某些情况下页面会存在多个同名标题节点（有的不可见），这里优先选择可见的那个
+      const waitForVisibleTitle = async (timeoutMs: number) => {
+        const start = Date.now();
+        while (Date.now() - start < timeoutMs) {
+          const candidates = Array.from(document.querySelectorAll(titleSelector));
+          const visibleCandidates = candidates.filter(isVisible);
+          if (visibleCandidates.length > 0) {
+            // 取最后一个可见节点，兼容历史逻辑（之前取了 NodeList[1]）
+            return visibleCandidates[visibleCandidates.length - 1];
+          }
+          await new Promise<void>((resolve) => setTimeout(resolve, 100));
+        }
+        return null;
+      };
 
-    if (questionContainer) {
-      const titleParent = titleElement.parentElement;
-      if (titleParent && !titleParent.querySelector('.zhihu-ai-summary-btn-question-container')) {
+      // 先等元素出现，再等“可见的标题节点”出现
+      await waitForElement(document.body, titleSelector, 5000);
+      const titleElement = await waitForVisibleTitle(5000);
+
+      if (!titleElement) {
+        return;
+      }
+
+      const questionContainer = document.querySelector('.QuestionHeader') ||
+                              document.querySelector('.Question-mainColumn') ||
+                              titleElement.closest('.QuestionHeader-content');
+
+      if (!questionContainer) {
+        return;
+      }
+
+      // 将按钮放到问题标题前面（同一行、标题文本之前）
+      let prefix = titleElement.querySelector('.zhihu-ai-question-title-prefix');
+      if (!prefix) {
+        prefix = document.createElement('span');
+        prefix.className = 'zhihu-ai-question-title-prefix';
+        titleElement.insertBefore(prefix, titleElement.firstChild);
+      }
+
+      if (!prefix.querySelector('.zhihu-ai-summary-btn-question-container')) {
         addSummaryButton(
-          titleParent,
+          prefix,
           extractQuestionFn,
           'zhihu-ai-summary-btn-question',
           'question'
         );
       }
+    } catch {
+      // 忽略超时/DOM 变更导致的等待失败
     }
-  }, 2000);
+  })();
 }
 
 /**
