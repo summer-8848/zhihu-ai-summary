@@ -42,6 +42,15 @@
   will-change: transform;
 }
 
+/* 用于吸顶/固定在 viewport 的面板（文章滚动吸顶 & 问题固定面板共用） */
+.zhihu-ai-side-panel.zhihu-ai-panel-fixed {
+  position: fixed;
+  margin-left: 0;
+  overflow-y: auto;
+  max-height: 100vh;
+  z-index: 1000;
+}
+
 .zhihu-ai-side-panel--dragging {
   cursor: grabbing;
 }
@@ -71,7 +80,7 @@
   right: auto;
   left: 65%;
   margin-left: 0;
-  max-height: calc(100vh - 120px);
+  max-height: 100vh;
   overflow-y: auto;
   z-index: 1;
 }

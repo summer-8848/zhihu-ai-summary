@@ -250,9 +250,34 @@ export function SummaryPanel({
       }, 150);
     };
 
+    const headerOffset = 70;
+    const questionTopOffset = 135;
+    const viewportBottomGap = 24;
+
+    const applyFixedForBody = () => {
+      panel.classList.add('zhihu-ai-panel-fixed');
+      parentElement = document.body;
+    };
+
     if (panelType === 'question') {
       panel.classList.add('question-fixed');
       parentElement = document.body;
+      panel.classList.add('zhihu-ai-panel-fixed');
+      const updateQuestionMaxHeight = () => {
+        panel.style.overflowY = 'auto';
+        panel.style.maxHeight = `${Math.max(200, window.innerHeight - questionTopOffset - viewportBottomGap)}px`;
+      };
+
+      updateQuestionMaxHeight();
+      window.addEventListener('resize', updateQuestionMaxHeight);
+
+      const prevCleanup = panel.__cleanup;
+      panel.__cleanup = () => {
+        if (prevCleanup) {
+          prevCleanup();
+        }
+        window.removeEventListener('resize', updateQuestionMaxHeight);
+      };
     } else if (panelType === 'answer') {
       // 对于回答，找到回答元素
       answerItem = targetElement.closest('.ContentItem.AnswerItem');
@@ -312,7 +337,58 @@ export function SummaryPanel({
         if (!elem.style.position || elem.style.position === 'static') {
           elem.style.position = 'relative';
         }
+
+        // 文章页：默认跟随容器；当滚动导致容器顶部离开视口时，面板吸顶（fixed）
         panel.style.top = '0';
+
+        const updateArticleAffix = () => {
+          const rect = elem.getBoundingClientRect();
+          if (rect.top < headerOffset) {
+            // 切到 fixed 时，需要把 left 锁定在“正文右侧”
+            const left = rect.right + 25;
+            panel.style.left = `${Math.round(left)}px`;
+            panel.style.top = `${headerOffset}px`;
+            panel.style.overflowY = 'auto';
+            panel.style.maxHeight = `${Math.max(200, window.innerHeight - headerOffset - viewportBottomGap)}px`;
+            applyFixedForBody();
+          } else {
+            // 还原到容器内定位
+            panel.classList.remove('zhihu-ai-panel-fixed');
+            panel.style.left = '100%';
+            panel.style.top = '0';
+            panel.style.overflowY = 'auto';
+            // 面板在容器内时，面板实际 top 与容器 top 一致（相对 viewport）
+            panel.style.maxHeight = `${Math.max(200, window.innerHeight - rect.top - viewportBottomGap)}px`;
+            parentElement = articleContainer;
+          }
+
+          // 按需移动 DOM
+          if (parentElement && panel.parentElement !== parentElement) {
+            parentElement.appendChild(panel);
+          }
+        };
+
+        // 初始化一次 + 监听滚动/窗口尺寸
+        const onScroll = () => {
+          updateArticleAffix();
+        };
+        const onResize = () => {
+          updateArticleAffix();
+        };
+
+        updateArticleAffix();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onResize);
+
+        // 合并清理逻辑
+        const prevCleanup = panel.__cleanup;
+        panel.__cleanup = () => {
+          if (prevCleanup) {
+            prevCleanup();
+          }
+          window.removeEventListener('scroll', onScroll);
+          window.removeEventListener('resize', onResize);
+        };
       }
     }
 
