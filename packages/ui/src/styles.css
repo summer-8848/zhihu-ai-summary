@@ -876,6 +876,35 @@
   font-weight: 600;
   color: #555;
   margin: 12px 0 6px 0;
+  }
+
+.zhihu-ai-answer-result-body h4,
+.zhihu-ai-article-result-body h4,
+.zhihu-ai-inline-body h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  margin: 10px 0 6px 0;
+  padding-left: 8px;
+  border-left: 3px solid rgba(23, 114, 246, 0.35);
+}
+
+.zhihu-ai-answer-result-body h5,
+.zhihu-ai-article-result-body h5,
+.zhihu-ai-inline-body h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  margin: 10px 0 6px 0;
+}
+
+.zhihu-ai-answer-result-body h6,
+.zhihu-ai-article-result-body h6,
+.zhihu-ai-inline-body h6 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #777;
+  margin: 10px 0 6px 0;
 }
 
 .zhihu-ai-answer-result-body p,
@@ -941,6 +970,15 @@
   color: #d63384;
   background: #f8f9fa;
   padding: 2px 6px;
+  border-radius: 3px;
+  }
+
+.zhihu-ai-answer-result-body mark,
+.zhihu-ai-article-result-body mark,
+.zhihu-ai-inline-body mark {
+  background: rgba(250, 173, 20, 0.28);
+  color: inherit;
+  padding: 0 2px;
   border-radius: 3px;
 }
 

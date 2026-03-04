@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'preact/hooks';
-import { MarkdownParser, type APIClient, type ExtractedContent } from '@zhihu-ai-summary/core';
+import { MarkdownFormatter, MarkdownParser, type APIClient, type ExtractedContent } from '@zhihu-ai-summary/core';
 import { SummaryButton } from './SummaryButton';
 import { SummaryPanel } from './SummaryPanel';
 import { toast } from './Toast';
@@ -115,8 +115,9 @@ export function SummaryButtonWrapper({
         },
         () => {
           const fullText = authorPrefix + fullMarkdown;
-          setMarkdown(fullText);
-          setHtml(MarkdownParser.parse(fullText));
+          const formatted = MarkdownFormatter.format(fullText);
+          setMarkdown(formatted);
+          setHtml(MarkdownParser.parse(formatted));
           setLoading(false);
           setStreaming(false);
           restoreSideColumn();
