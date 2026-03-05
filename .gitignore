@@ -5,6 +5,8 @@
 # files
 node_modules
 dist
+.wxt
+.output
 *.local
 *.log
 .DS_Store

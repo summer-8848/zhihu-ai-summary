@@ -1,13 +1,15 @@
-import { ConfigManager, Account } from '@zhihu-ai-summary/core';
-import { ExtensionStorage } from './storage';
+import { ConfigManager, type Account } from '@zhihu-ai-summary/core';
+
+import { ExtensionStorage } from '../../storage';
 
 const storage = new ExtensionStorage();
 const configManager = new ConfigManager(storage);
 
-// 初始化 popup 页面
 async function initPopup() {
   const app = document.getElementById('app');
-  if (!app) {return;}
+  if (!app) {
+    return;
+  }
 
   const accounts = (await configManager.get('AI_ACCOUNTS', [])) ?? [];
   const currentAccountId = (await configManager.get('CURRENT_ACCOUNT_ID', '')) ?? '';
@@ -49,7 +51,6 @@ async function initPopup() {
     </div>
   `;
 
-  // 加载当前配置
   if (accounts.length > 0) {
     const currentAccount = accounts.find((acc) => acc.id === currentAccountId) || accounts[0];
     if (currentAccount) {
@@ -59,7 +60,6 @@ async function initPopup() {
     }
   }
 
-  // 保存配置
   document.getElementById('saveBtn')?.addEventListener('click', async () => {
     const apiKey = (document.getElementById('apiKey') as HTMLInputElement).value;
     const apiUrl = (document.getElementById('apiUrl') as HTMLInputElement).value;
@@ -80,13 +80,8 @@ async function initPopup() {
     };
 
     try {
-      const ok1 = await configManager.set('AI_ACCOUNTS', [newAccount]);
-      const ok2 = await configManager.set('CURRENT_ACCOUNT_ID', accountId);
-      if (!ok1 || !ok2) {
-        showMessage('保存配置失败，请重试', 'error');
-        return;
-      }
-
+      await configManager.set('AI_ACCOUNTS', [newAccount]);
+      await configManager.set('CURRENT_ACCOUNT_ID', accountId);
       showMessage('配置保存成功！', 'success');
     } catch (error) {
       console.error('保存配置失败:', error);
@@ -97,7 +92,9 @@ async function initPopup() {
 
 function showMessage(text: string, type: 'success' | 'error') {
   const message = document.getElementById('message');
-  if (!message) {return;}
+  if (!message) {
+    return;
+  }
 
   message.textContent = text;
   message.style.display = 'block';

@@ -382,7 +382,7 @@ export class MarkdownFormatter {
 
       // Skip all formatting inside fenced code blocks
       const trimmedLine = line.trim();
-      const fenceMatch = trimmedLine.match(/^(\`\`\`|\~\~\~)/);
+      const fenceMatch = trimmedLine.match(/^(```|~~~)/);
       if (fenceMatch) {
         const marker = fenceMatch[1] as '```' | '~~~';
         if (!inFence) {

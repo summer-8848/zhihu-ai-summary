@@ -9,6 +9,8 @@ export default [
     ignores: [
       '**/node_modules/**',
       '**/dist/**',
+      '**/.wxt/**',
+      '**/.output/**',
       '**/*.config.js',
       '**/*.config.ts',
       '**/vite.config.ts.timestamp-*.mjs',

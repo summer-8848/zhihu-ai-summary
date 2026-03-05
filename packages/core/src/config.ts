@@ -27,7 +27,7 @@ type BatchDefaults<K extends ConfigKey> = { [P in K]: ConfigValueMap[P] };
 
 // 配置管理器
 export class ConfigManager {
-  constructor(private storage: StorageAdapter) {}
+  constructor(private adapter: StorageAdapter) {}
 
   async get<K extends ConfigKey>(key: K, defaultValue: ConfigValueMap[K]): Promise<ConfigValueMap[K]>;
   async get<K extends ConfigKey>(key: K, defaultValue?: ConfigValueMap[K]): Promise<ConfigValueMap[K] | undefined>;
@@ -36,7 +36,7 @@ export class ConfigManager {
     defaultValue?: ConfigValueMap[K]
   ): Promise<ConfigValueMap[K] | undefined> {
     try {
-      return await this.storage.get<ConfigValueMap[K]>(key, defaultValue);
+      return await this.adapter.get<ConfigValueMap[K]>(key, defaultValue);
     } catch (error) {
       console.warn(`配置获取失败 [${key}]:`, error);
       return defaultValue;
@@ -45,7 +45,7 @@ export class ConfigManager {
 
   async set<K extends ConfigKey>(key: K, value: ConfigValueMap[K]): Promise<boolean> {
     try {
-      await this.storage.set<ConfigValueMap[K]>(key, value);
+      await this.adapter.set<ConfigValueMap[K]>(key, value);
       return true;
     } catch (error) {
       console.error(`配置设置失败 [${key}]:`, error);

@@ -11,8 +11,8 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["vite/client", "chrome", "node"]
+    "types": ["chrome", "node"]
   },
-  "include": ["src/**/*", "vite.config.ts"],
+  "include": ["src/**/*", "wxt.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

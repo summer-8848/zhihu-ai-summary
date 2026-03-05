@@ -4,9 +4,10 @@
   "description": "知乎中的文章、问题和回答提供 AI 智能总结功能",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true });\""
+    "dev": "wxt",
+    "build": "wxt prepare && wxt build",
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true }); require('fs').rmSync('.wxt', { recursive: true, force: true });\"",
+    "postinstall": "wxt prepare"
   },
   "keywords": [
     "zhihu",
@@ -22,11 +23,10 @@
     "preact": "^10.19.3"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "^2.0.0-beta.21",
     "@preact/preset-vite": "^2.7.0",
     "@types/chrome": "^0.0.254",
     "typescript": "^5.3.3",
-    "vite": "^5.0.0"
+    "wxt": "^0.20.18"
   },
   "homepage": "https://github.com/summer-8848/zhihu-ai-summary",
   "repository": "https://github.com/summer-8848/zhihu-ai-summary",
