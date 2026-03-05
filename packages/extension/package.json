@@ -1,6 +1,6 @@
 {
   "name": "@zhihu-ai-summary/extension",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "知乎中的文章、问题和回答提供 AI 智能总结功能",
   "type": "module",
   "scripts": {

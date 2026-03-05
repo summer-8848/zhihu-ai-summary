@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.3.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.2.0...v2.3.0) (2026-03-05)
+
+
+### Features
+
+* 问题和文章的总结结果增加吸顶的功能 ([873a2aa](https://github.com/summer-8848/zhihu-ai-summary/commit/873a2aab92244f34d8c4a692edabc30073de3871))
+* 修改问题AI总结按钮的位置 ([12835bb](https://github.com/summer-8848/zhihu-ai-summary/commit/12835bb99b049ace73e838e8fff40165eb3e7bc0))
+* AI总结结果面板增加拖动功能 ([524eefb](https://github.com/summer-8848/zhihu-ai-summary/commit/524eefb5f085bcaa9921d12d2de1d9015fce47ec))
+
 ## [2.2.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.1.2...v2.2.0) (2026-03-03)
 
 
