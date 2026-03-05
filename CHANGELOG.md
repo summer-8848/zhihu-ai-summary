@@ -1,6 +1,5 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
 ## [2.3.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.2.0...v2.3.0) (2026-03-05)
 
@@ -10,6 +9,21 @@ All notable changes to this project will be documented in this file. See [commit
 * 问题和文章的总结结果增加吸顶的功能 ([873a2aa](https://github.com/summer-8848/zhihu-ai-summary/commit/873a2aab92244f34d8c4a692edabc30073de3871))
 * 修改问题AI总结按钮的位置 ([12835bb](https://github.com/summer-8848/zhihu-ai-summary/commit/12835bb99b049ace73e838e8fff40165eb3e7bc0))
 * AI总结结果面板增加拖动功能 ([524eefb](https://github.com/summer-8848/zhihu-ai-summary/commit/524eefb5f085bcaa9921d12d2de1d9015fce47ec))
+
+
+### Refactoring
+
+* 使用wxt重构浏览器插件开发 ([4913ef8](https://github.com/summer-8848/zhihu-ai-summary/commit/4913ef8fdc1539e69ed6286154388ffbae0e4183))
+
+
+### Styles
+
+* 优化markdown渲染 ([6649fb2](https://github.com/summer-8848/zhihu-ai-summary/commit/6649fb236add25f7d21aed8e6ccf829e88cd41e6))
+
+
+### Chores
+
+* 修改relese流水线 ([65a2b7f](https://github.com/summer-8848/zhihu-ai-summary/commit/65a2b7f14a32359689a6db4b401f465a12dc90f9))
 
 ## [2.2.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.1.2...v2.2.0) (2026-03-03)
 
@@ -22,6 +36,12 @@ All notable changes to this project will be documented in this file. See [commit
 ### Bug Fixes
 
 * 修复eslint版本不兼容 ([ba1a543](https://github.com/summer-8848/zhihu-ai-summary/commit/ba1a54327f7301e68091820a23d74915a7133013))
+
+
+### Chores
+
+* 修改发布标题 ([71913a5](https://github.com/summer-8848/zhihu-ai-summary/commit/71913a5c439498101a7d77df5e6141b84af10d7c))
+* 压缩打包文件体积 ([1395fc5](https://github.com/summer-8848/zhihu-ai-summary/commit/1395fc5edb609fd4b59ebc0115a1b0a085fed6a5))
 
 ## [2.1.2](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.1.1...v2.1.2) (2026-03-02)
 
@@ -55,10 +75,32 @@ All notable changes to this project will be documented in this file. See [commit
 * 修复 pnpm run dev:extension 热更新无效 ([ecf9a32](https://github.com/summer-8848/zhihu-ai-summary/commit/ecf9a32d5766e5bdae209663c0fa2a40a0c430bc))
 * 修复pnpm run clean报错 ([7487e66](https://github.com/summer-8848/zhihu-ai-summary/commit/7487e666377b52c40be187f44dbdbd74975a2cd9))
 
-## 2.0.0 (2026-02-25)
 
-### Features
-* 使用现代化的 monorepo 架构重构，方便本地开发调试和发版
+### Refactoring
+
+* 重写userscript并将公共部分提取到ui和core中 ([b8130e0](https://github.com/summer-8848/zhihu-ai-summary/commit/b8130e0d4a83d7cabff8a0d0289ca4d41857f5eb))
+
+
+### Styles
+
+* 美化确认框 ([264de2b](https://github.com/summer-8848/zhihu-ai-summary/commit/264de2bb342b96a3b223c36daa9763f5e6198e1a))
+* 全局主题色由紫色改为蓝色 ([f026443](https://github.com/summer-8848/zhihu-ai-summary/commit/f026443f5b59f11474024ee1cfc541eed44c73f4))
+* 整合样式文件 ([bc36b3e](https://github.com/summer-8848/zhihu-ai-summary/commit/bc36b3ea79d5f4007d286e22749a61348c92c62a))
+
+
+### Chores
+
+* 迁移readme ([1d715fb](https://github.com/summer-8848/zhihu-ai-summary/commit/1d715fb54499df7baf224fb8cb2b22d4512f4ea8))
+* 强化eslint验证，解决any类型遗留 ([83b0754](https://github.com/summer-8848/zhihu-ai-summary/commit/83b0754261daa20fd5eb4ea328cb5c1c33df193f))
+* 完成浏览器扩展版功能测试 ([05037dc](https://github.com/summer-8848/zhihu-ai-summary/commit/05037dca62e9a76093d1ec09465da26ffc309d03))
+* 修改油猴脚本开发模式 ([36d354b](https://github.com/summer-8848/zhihu-ai-summary/commit/36d354bfab9c306e6e5687131b28c997d97582eb))
+
+## [2.0.0](https://github.com/summer-8848/zhihu-ai-summary/compare/267b944d427c29dbe22e7b8c9ffc10d63706ab79...v2.0.0) (2026-03-02)
+
+
+### Refactoring
+
+* 重构为现代化 monorepo 架构 ([267b944](https://github.com/summer-8848/zhihu-ai-summary/commit/267b944d427c29dbe22e7b8c9ffc10d63706ab79))
 
 ## 1.4.0 (2026-02-12)
 
@@ -99,3 +141,4 @@ All notable changes to this project will be documented in this file. See [commit
 * 多账号管理功能
 * 自动总结功能
 * 流式输出支持
+

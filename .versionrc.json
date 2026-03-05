@@ -1,4 +1,15 @@
 {
+  "header": "# Changelog\n\n",
+  "types": [
+    { "type": "feat", "section": "Features" },
+    { "type": "fix", "section": "Bug Fixes" },
+    { "type": "chore", "scope": "release", "hidden": true },
+    { "type": "refactor", "section": "Refactoring" },
+    { "type": "style", "section": "Styles" },
+    { "type": "chore", "section": "Chores" },
+    { "type": "docs", "section": "Documentation", "hidden": true },
+    { "type": "ci", "section": "Continuous Integration", "hidden": true }
+  ],
   "packageFiles": [
     "package.json",
     "packages/core/package.json",
