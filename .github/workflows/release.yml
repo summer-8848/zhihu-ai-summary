@@ -39,17 +39,8 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Package extension as ZIP
-        run: |
-          cd packages/extension/dist
-          # Best compression + exclude dev/build-only files
-          zip -r -9 ../../../extension.zip . \
-            -x "*.map" \
-            -x ".vite/*" \
-            -x "**/.vite/*" \
-            -x "**/.DS_Store" \
-            -x "__MACOSX/*"
-          cd ../../../
+      - name: Package extension as ZIP (chrome/firefox/safari)
+        run: pnpm release:extension
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -66,14 +57,16 @@ jobs:
             点击下方 Assets 中的 `zhihu-ai-summary.user.js` 文件，会自动提示安装到油猴扩展中。
             
             #### 浏览器扩展
-            1. 下载下方 Assets 中的 `extension.zip` 文件
+            1. 下载下方 Assets 中的浏览器扩展压缩包（按浏览器选择）
             2. 解压到本地文件夹
             3. 打开 Chrome 扩展管理页面 (chrome://extensions/)
             4. 开启"开发者模式"
             5. 点击"加载已解压的扩展程序"，选择解压后的文件夹
           files: |
             packages/userscript/dist/*.user.js
-            extension.zip
+            packages/extension/dist/zhihu-ai-summary-extension-*-chrome.zip
+            packages/extension/dist/zhihu-ai-summary-extension-*-firefox.zip
+            packages/extension/dist/zhihu-ai-summary-extension-*-safari.zip
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Summary

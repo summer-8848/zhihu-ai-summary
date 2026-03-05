@@ -5,7 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "wxt",
+    "dev:no-open": "wxt --debug --level info",
     "build": "wxt prepare && wxt build",
+    "build:chrome": "wxt prepare && wxt build -b chrome",
+    "build:firefox": "wxt prepare && wxt build -b firefox",
+    "build:safari": "wxt prepare && wxt build -b safari",
+    "build:all": "wxt prepare && wxt build -b chrome && wxt build -b firefox && wxt build -b safari",
+    "zip:chrome": "wxt prepare && wxt zip -b chrome",
+    "zip:firefox": "wxt prepare && wxt zip -b firefox",
+    "zip:safari": "wxt prepare && wxt zip -b safari",
+    "zip:all": "wxt prepare && wxt zip -b chrome && wxt zip -b firefox && wxt zip -b safari",
     "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true }); require('fs').rmSync('.wxt', { recursive: true, force: true });\"",
     "postinstall": "wxt prepare"
   },

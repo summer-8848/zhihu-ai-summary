@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -54,9 +54,10 @@ export default defineConfig({
   }),
 
   // Configure dev browser startup.
-  // Without this, web-ext typically opens a blank tab.
+  // Prefer manual loading via chrome://extensions (unpacked) during development.
+  // See: https://wxt.dev/api/reference/wxt/interfaces/webextconfig#disabled
   webExt: {
-    startUrls: ['https://www.zhihu.com/'],
+    disabled: true,
   },
 
   // Generate MV3 manifest matching the previous `manifest.json`.
@@ -79,6 +80,31 @@ export default defineConfig({
       32: 'icons/icon32.png',
       48: 'icons/icon48.png',
       128: 'icons/icon128.png',
+    },
+  },
+
+  // Zip bundles for manual distribution.
+  // Docs: https://wxt.dev/api/reference/wxt/interfaces/inlineconfig#zip
+  zip: {
+    // Override {{name}} used by WXT's default artifact template.
+    // This prevents WXT from producing "zhihu-ai-summaryextension-...".
+    name: 'zhihu-ai-summary-extension',
+
+    // Keep the default format, but with corrected name.
+    // Default is '{{name}}-{{version}}-{{browser}}.zip'
+    artifactTemplate: '{{name}}-{{version}}-{{browser}}.zip',
+  },
+
+  hooks: {
+    // WXT may generate an additional "sources" zip for Firefox.
+    // We don't distribute it, so delete it after the zip process completes.
+    // Docs: https://wxt.dev/api/reference/wxt/interfaces/wxthooks#zip-done
+    'zip:done': (_wxt, zipFiles) => {
+      for (const zipPath of zipFiles) {
+        if (zipPath.endsWith('-sources.zip') && existsSync(zipPath)) {
+          unlinkSync(zipPath);
+        }
+      }
     },
   },
 });
