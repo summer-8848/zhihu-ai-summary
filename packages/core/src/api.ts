@@ -1,6 +1,59 @@
 import type { ConfigManager } from './config';
 import type { ExtractedContent, ArticleContent, QuestionContent, AnswerContent } from './extractor';
 
+const CHAT_COMPLETIONS_PATH = '/v1/chat/completions';
+
+export function normalizeChatCompletionsUrl(input: string): string {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    return '';
+  }
+
+  let parsed: URL | null = null;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    parsed = null;
+  }
+
+  if (!parsed) {
+    const withoutTrailingSlash = trimmed.replace(/\/+$/, '');
+    if (withoutTrailingSlash.endsWith(CHAT_COMPLETIONS_PATH)) {
+      return withoutTrailingSlash;
+    }
+    if (withoutTrailingSlash.endsWith('/v1/chat/completions/')) {
+      return withoutTrailingSlash.replace(/\/+$/, '');
+    }
+    if (withoutTrailingSlash.endsWith('/v1')) {
+      return `${withoutTrailingSlash}/chat/completions`;
+    }
+    if (withoutTrailingSlash.endsWith('/v1/')) {
+      return `${withoutTrailingSlash.replace(/\/+$/, '')}/chat/completions`;
+    }
+    return `${withoutTrailingSlash}${CHAT_COMPLETIONS_PATH}`;
+  }
+
+  parsed.hash = '';
+  parsed.search = '';
+
+  const pathname = parsed.pathname.replace(/\/+$/, '');
+  if (pathname === '' || pathname === '/') {
+    parsed.pathname = CHAT_COMPLETIONS_PATH;
+    return parsed.toString();
+  }
+  if (pathname.endsWith(CHAT_COMPLETIONS_PATH)) {
+    parsed.pathname = pathname;
+    return parsed.toString();
+  }
+  if (pathname.endsWith('/v1')) {
+    parsed.pathname = `${pathname}/chat/completions`;
+    return parsed.toString();
+  }
+
+  parsed.pathname = `${pathname}${CHAT_COMPLETIONS_PATH}`;
+  return parsed.toString();
+}
+
 export interface APIResponse {
   success: boolean;
   message: string;

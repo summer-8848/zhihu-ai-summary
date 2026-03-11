@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'preact/hooks';
+import { normalizeChatCompletionsUrl } from '@zhihu-ai-summary/core';
 import type { Account, ConfigManager, APIClient } from '@zhihu-ai-summary/core';
 import { toast } from './Toast';
 import { InputModal } from './InputModal';
@@ -181,13 +182,27 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
     }
   };
 
+  const handleKeyDownActivate = (e: KeyboardEvent, action: () => void) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action();
+    }
+  };
+
   return (
     <>
-      <div className="zhihu-ai-modal" onClick={onClose}>
-        <div className="zhihu-ai-modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="zhihu-ai-modal">
+        <button
+          type="button"
+          className="zhihu-ai-modal-overlay"
+          aria-label="关闭弹窗"
+          onClick={onClose}
+        />
+        <div className="zhihu-ai-modal-content" role="dialog" aria-modal="true" aria-label={appName} tabIndex={-1}>
         <div className="zhihu-ai-modal-header">
           <div className="zhihu-ai-modal-title">
             <svg width="24" height="24" viewBox="0 0 1024 1024" fill="#1772f6">
+              <title>{appName}</title>
               <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/>
               <path d="M464 336a48 48 0 1 0 96 0 48 48 0 1 0-96 0z m72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"/>
             </svg>
@@ -214,23 +229,27 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
               </div>
             </div>
           </div>
-          <button className="zhihu-ai-modal-close" onClick={onClose}>×</button>
+          <button type="button" className="zhihu-ai-modal-close" onClick={onClose} aria-label="关闭">×</button>
         </div>
 
         <div className="zhihu-ai-modal-body">
           <div className="zhihu-ai-tabs">
-            <div
+            <button
+              type="button"
               className={`zhihu-ai-tab ${activeTab === 'accounts' ? 'active' : ''}`}
               onClick={() => setActiveTab('accounts')}
+              onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('accounts'))}
             >
               账号管理
-            </div>
-            <div
+            </button>
+            <button
+              type="button"
               className={`zhihu-ai-tab ${activeTab === 'settings' ? 'active' : ''}`}
               onClick={() => setActiveTab('settings')}
+              onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('settings'))}
             >
               基础设置
-            </div>
+            </button>
           </div>
 
           {activeTab === 'accounts' && (
@@ -245,16 +264,23 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
                     <div
                       key={account.id}
                       className={`zhihu-ai-account-item ${account.id === currentAccountId ? 'active' : ''}`}
-                      onClick={() => handleSelectAccount(account.id)}
                     >
-                      <div className="zhihu-ai-account-info">
-                        <div className="zhihu-ai-account-name">{account.name}</div>
-                        <div className="zhihu-ai-account-detail">
-                          {account.model} • {account.apiUrl.length > 40 ? account.apiUrl.substring(0, 40) + '...' : account.apiUrl}
+                      <button
+                        type="button"
+                        className="zhihu-ai-account-select"
+                        onClick={() => handleSelectAccount(account.id)}
+                        onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => handleSelectAccount(account.id))}
+                      >
+                        <div className="zhihu-ai-account-info">
+                          <div className="zhihu-ai-account-name">{account.name}</div>
+                          <div className="zhihu-ai-account-detail">
+                            {account.model} • {account.apiUrl.length > 40 ? account.apiUrl.substring(0, 40) + '...' : account.apiUrl}
+                          </div>
                         </div>
-                      </div>
+                      </button>
                       <div className="zhihu-ai-account-actions">
                         <button
+                          type="button"
                           className="zhihu-ai-account-btn zhihu-ai-account-btn-copy"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -265,6 +291,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
                           复制
                         </button>
                         <button
+                          type="button"
                           className="zhihu-ai-account-btn zhihu-ai-account-btn-edit"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -275,6 +302,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
                           编辑
                         </button>
                         <button
+                          type="button"
                           className="zhihu-ai-account-btn zhihu-ai-account-btn-delete"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -289,6 +317,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
                 )}
               </div>
               <button
+                type="button"
                 className="zhihu-ai-add-account-btn"
                 onClick={() => {
                   setEditingAccountId(null);
@@ -316,10 +345,11 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
                   </label>
                 </div>
                 <div className="zhihu-ai-config-item">
-                  <label className="zhihu-ai-config-label">回答最少字数:</label>
+                  <label className="zhihu-ai-config-label" htmlFor="zhihu-ai-min-answer-length">回答最少字数:</label>
                   <input
                     type="number"
                     className="zhihu-ai-config-input"
+                    id="zhihu-ai-min-answer-length"
                     value={minAnswerLength}
                     min="0"
                     placeholder="200"
@@ -333,12 +363,14 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
                 <div className="zhihu-ai-config-item">
                   <div className="zhihu-ai-config-btn-group">
                     <button
+                      type="button"
                       className="zhihu-ai-config-btn-half zhihu-ai-config-btn-secondary"
                       onClick={handleExportConfig}
                     >
                       📋 复制配置
                     </button>
                     <button
+                      type="button"
                       className="zhihu-ai-config-btn-half zhihu-ai-config-btn-warning"
                       onClick={() => setShowImportModal(true)}
                     >
@@ -347,7 +379,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
                   </div>
                 </div>
                 <div className="zhihu-ai-config-item">
-                  <button className="zhihu-ai-config-save" onClick={handleSaveSettings}>
+                  <button type="button" className="zhihu-ai-config-save" onClick={handleSaveSettings}>
                     保存设置
                   </button>
                 </div>
@@ -431,8 +463,18 @@ function AccountFormModal({
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
 
+  const normalizeApiUrlInForm = () => {
+    const normalized = normalizeChatCompletionsUrl(formData.apiUrl);
+    if (normalized && normalized !== formData.apiUrl) {
+      setFormData((prev) => ({ ...prev, apiUrl: normalized }));
+    }
+  };
+
   const handleTest = async () => {
-    if (!formData.apiUrl || !formData.apiKey || !formData.model) {
+    normalizeApiUrlInForm();
+    const apiUrl = normalizeChatCompletionsUrl(formData.apiUrl);
+
+    if (!apiUrl || !formData.apiKey || !formData.model) {
       setTestResult({ success: false, message: '请填写完整信息' });
       return;
     }
@@ -440,14 +482,15 @@ function AccountFormModal({
     setTesting(true);
     setTestResult(null);
 
-    const result = await apiClient.testConnection(formData.apiKey, formData.apiUrl, formData.model);
+    const result = await apiClient.testConnection(formData.apiKey, apiUrl, formData.model);
 
     setTesting(false);
     setTestResult(result);
   };
 
   const handleSave = async () => {
-    if (!formData.apiUrl || !formData.apiKey || !formData.model) {
+    const apiUrl = normalizeChatCompletionsUrl(formData.apiUrl);
+    if (!apiUrl || !formData.apiKey || !formData.model) {
       toast.warning('请填写完整的账号信息');
       return;
     }
@@ -460,7 +503,7 @@ function AccountFormModal({
         allAccounts[index] = {
           id: editingAccountId,
           name: formData.name || formData.apiUrl,
-          apiUrl: formData.apiUrl,
+          apiUrl,
           apiKey: formData.apiKey,
           model: formData.model,
         };
@@ -469,7 +512,7 @@ function AccountFormModal({
       const newAccount: Account = {
         id: Date.now().toString(),
         name: formData.name || formData.apiUrl,
-        apiUrl: formData.apiUrl,
+        apiUrl,
         apiKey: formData.apiKey,
         model: formData.model,
       };
@@ -489,37 +532,54 @@ function AccountFormModal({
   const saveButtonText = editingAccountId ? '保存修改' : '添加账号';
 
   return (
-    <div className="zhihu-ai-modal" style={{ zIndex: 10001 }} onClick={onClose}>
-      <div className="zhihu-ai-modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
+    <div className="zhihu-ai-modal" style={{ zIndex: 10001 }}>
+      <button
+        type="button"
+        className="zhihu-ai-modal-overlay"
+        aria-label="关闭弹窗"
+        onClick={onClose}
+      />
+      <div
+        className="zhihu-ai-modal-content"
+        style={{ maxWidth: '500px' }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        tabIndex={-1}
+      >
         <div className="zhihu-ai-modal-header">
           <div className="zhihu-ai-modal-title">{title}</div>
-          <button className="zhihu-ai-modal-close" onClick={onClose}>×</button>
+          <button type="button" className="zhihu-ai-modal-close" onClick={onClose} aria-label="关闭">×</button>
         </div>
         <div className="zhihu-ai-modal-body">
           <div className="zhihu-ai-config-panel">
             <div className="zhihu-ai-config-item">
-              <label className="zhihu-ai-config-label">备注名称:</label>
+              <label className="zhihu-ai-config-label" htmlFor="zhihu-ai-account-api-url">API接口地址:</label>
               <input
-                type="text"
-                className="zhihu-ai-config-input"
-                value={formData.name}
-                placeholder="默认使用API地址"
-                onInput={(e) => setFormData({ ...formData, name: (e.target as HTMLInputElement).value })}
-              />
-            </div>
-            <div className="zhihu-ai-config-item">
-              <label className="zhihu-ai-config-label">API接口地址:</label>
-              <input
+                id="zhihu-ai-account-api-url"
                 type="text"
                 className="zhihu-ai-config-input"
                 value={formData.apiUrl}
                 placeholder="https://api.openai.com/v1/chat/completions"
                 onInput={(e) => setFormData({ ...formData, apiUrl: (e.target as HTMLInputElement).value })}
+                onBlur={normalizeApiUrlInForm}
+              />
+            </div>
+             <div className="zhihu-ai-config-item">
+              <label className="zhihu-ai-config-label" htmlFor="zhihu-ai-account-name">备注名称:</label>
+              <input
+                id="zhihu-ai-account-name"
+                type="text"
+                className="zhihu-ai-config-input"
+                value={formData.name}
+                placeholder="ChatGPT 账号1"
+                onInput={(e) => setFormData({ ...formData, name: (e.target as HTMLInputElement).value })}
               />
             </div>
             <div className="zhihu-ai-config-item">
-              <label className="zhihu-ai-config-label">API Key:</label>
+              <label className="zhihu-ai-config-label" htmlFor="zhihu-ai-account-api-key">API Key:</label>
               <input
+                id="zhihu-ai-account-api-key"
                 type="password"
                 className="zhihu-ai-config-input"
                 value={formData.apiKey}
@@ -528,8 +588,9 @@ function AccountFormModal({
               />
             </div>
             <div className="zhihu-ai-config-item">
-              <label className="zhihu-ai-config-label">模型名称:</label>
+              <label className="zhihu-ai-config-label" htmlFor="zhihu-ai-account-model">模型名称:</label>
               <input
+                id="zhihu-ai-account-model"
                 type="text"
                 className="zhihu-ai-config-input"
                 value={formData.model}
@@ -549,6 +610,7 @@ function AccountFormModal({
             )}
             <div className="zhihu-ai-config-btn-group">
               <button
+                type="button"
                 className="zhihu-ai-config-btn-half zhihu-ai-config-test zhihu-ai-config-btn-secondary"
                 onClick={handleTest}
                 disabled={testing}
@@ -556,6 +618,7 @@ function AccountFormModal({
                 {testing ? '测试中...' : '测试连接'}
               </button>
               <button
+                type="button"
                 className="zhihu-ai-config-btn-half zhihu-ai-config-save"
                 onClick={handleSave}
               >
