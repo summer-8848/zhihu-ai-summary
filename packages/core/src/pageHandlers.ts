@@ -221,8 +221,9 @@ export async function handleAnswers(
 export function setupAnswerObserver(
   handleAnswersFn: () => void
 ) {
+  // -------- MutationObserver: 监听 DOM 变化（回答节点增删） --------
   let debounceTimer: number | null = null;
-  const observer = new MutationObserver(() => {
+  const mutationObserver = new MutationObserver(() => {
     if (debounceTimer) {
       clearTimeout(debounceTimer);
     }
@@ -234,13 +235,55 @@ export function setupAnswerObserver(
 
   const mainColumn = document.querySelector('.Question-mainColumn');
   if (mainColumn) {
-    observer.observe(mainColumn, { childList: true, subtree: true });
+    mutationObserver.observe(mainColumn, { childList: true, subtree: true });
   }
+
+  // -------- IntersectionObserver: 监听任意回答触发（虚拟列表兜底） --------
+  let scrollDebounceTimer: number | null = null;
+  const io = new IntersectionObserver(
+    () => {
+      if (scrollDebounceTimer) {
+        clearTimeout(scrollDebounceTimer);
+      }
+      scrollDebounceTimer = window.setTimeout(() => {
+        handleAnswersFn();
+        scrollDebounceTimer = null;
+      }, 200);
+    },
+    { root: null, rootMargin: '0px 0px 500px 0px', threshold: 0 }
+  );
+
+  const observeAllAnswers = () => {
+    document.querySelectorAll('.ContentItem.AnswerItem').forEach((el) => {
+      io.observe(el);
+    });
+  };
+  observeAllAnswers();
+
+  // 监听未来新增的回答节点，动态加入 IntersectionObserver
+  const answerListObserver = new MutationObserver(() => {
+    observeAllAnswers();
+  });
+  if (mainColumn) {
+    answerListObserver.observe(mainColumn, { childList: true, subtree: true });
+  }
+
+  // -------- setInterval 兜底：应对虚拟列表中 IntersectionObserver 漏触发 --------
+  // 知乎虚拟列表可能复用节点导致 IO 不触发，轮询确保 eventually 处理所有回答
+  const pollTimer = window.setInterval(() => {
+    handleAnswersFn();
+  }, 1000);
 
   return () => {
     if (debounceTimer) {
       clearTimeout(debounceTimer);
     }
-    observer.disconnect();
+    if (scrollDebounceTimer) {
+      clearTimeout(scrollDebounceTimer);
+    }
+    clearInterval(pollTimer);
+    mutationObserver.disconnect();
+    io.disconnect();
+    answerListObserver.disconnect();
   };
 }
