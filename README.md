@@ -3,11 +3,31 @@
 一个强大的脚本，为知乎文章、问题和回答添加AI总结功能，使用ChatGPT进行智能内容总结。
 
 <details>
-<summary>重构说明</summary>
+<summary>技术栈与重构说明</summary>
+
+### 老版本
 
 - [原油猴脚本版](https://github.com/summer-8848/zhihu-ai-summary-tampermonkey)
-
 - [原浏览器扩展版](https://github.com/summer-8848/zhihu-ai-summary-extension)
+
+### 技术栈
+
+| 版本 | 技术 |
+|------|------|
+| 通用 | TypeScript + Preact + pnpm workspaces (Monorepo) |
+| 油猴脚本 | Vite + Tampermonkey API |
+| 浏览器扩展 | [WXT](https://wxt.dev/) (支持 Chrome、Firefox、Safari) |
+
+### 重构说明
+
+本项目由原来的油猴脚本版和浏览器扩展版重构为 Monorepo 结构，使用 pnpm workspaces 管理多个包：
+
+- `packages/core` - 核心业务逻辑（API、配置、内容提取、Markdown 解析）
+- `packages/ui` - 共享 UI 组件
+- `packages/userscript` - 油猴脚本
+- `packages/extension` - 浏览器扩展（使用 WXT 框架，可构建至 Chrome、Firefox、Safari）
+
+> 想开发油猴脚本 + 浏览器扩展双版本工具的开发者，可参考本项目的 Monorepo 结构设计。
 
 </details>
 
