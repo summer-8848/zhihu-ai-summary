@@ -1,6 +1,23 @@
 # Changelog
 
 
+## [2.4.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.3.0...v2.4.0) (2026-03-19)
+
+
+### Features
+
+* 添加账号时，自动给 API接口地址 追加 v1/chat/completions ([f984d25](https://github.com/summer-8848/zhihu-ai-summary/commit/f984d254953c98ef15070aacb1ab9952a756e36b))
+
+
+### Bug Fixes
+
+* 修复点击「查看全部」后懒加载回答缺少AI总结按钮的问题 ([65318d0](https://github.com/summer-8848/zhihu-ai-summary/commit/65318d0c9a4a242b1835eda72085c96c26616cb0))
+
+
+### Chores
+
+* 重新生成changelog.md ([2e0f383](https://github.com/summer-8848/zhihu-ai-summary/commit/2e0f383f0ff60ec39b43a16c309639eb9ba73c9f))
+
 ## [2.3.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.2.0...v2.3.0) (2026-03-05)
 
 
