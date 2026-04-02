@@ -10,7 +10,7 @@
 - [原油猴脚本版](https://github.com/summer-8848/zhihu-ai-summary-tampermonkey)
 - [原浏览器扩展版](https://github.com/summer-8848/zhihu-ai-summary-extension)
 
-### 技术栈
+### 新版本技术栈
 
 | 版本 | 技术 |
 |------|------|
@@ -34,7 +34,7 @@
 ## 安装
 
 - [一键安装油猴脚本](https://greasyfork.org/zh-CN/scripts/559782-%E7%9F%A5%E4%B9%8Eai%E6%80%BB%E7%BB%93%E5%8A%A9%E6%89%8B-by-summer121?locale_override=1)
-- [安装浏览器扩展版](https://github.com/summer-8848/zhihu-ai-summary)
+- [安装浏览器扩展版](https://github.com/summer-8848/zhihu-ai-summary/releases)
 
 ## 功能特点
 
