@@ -30,6 +30,9 @@ export function normalizeChatCompletionsUrl(input: string): string {
     if (withoutTrailingSlash.endsWith('/v1/')) {
       return `${withoutTrailingSlash.replace(/\/+$/, '')}/chat/completions`;
     }
+    if (withoutTrailingSlash.includes('/v1/')) {
+      return withoutTrailingSlash;
+    }
     return `${withoutTrailingSlash}${CHAT_COMPLETIONS_PATH}`;
   }
 
@@ -47,6 +50,9 @@ export function normalizeChatCompletionsUrl(input: string): string {
   }
   if (pathname.endsWith('/v1')) {
     parsed.pathname = `${pathname}/chat/completions`;
+    return parsed.toString();
+  }
+  if (pathname.includes('/v1/')) {
     return parsed.toString();
   }
 
