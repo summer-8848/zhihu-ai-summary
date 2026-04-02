@@ -230,7 +230,7 @@ export function setupAnswerObserver(
     debounceTimer = window.setTimeout(() => {
       handleAnswersFn();
       debounceTimer = null;
-    }, 300);
+    }, 500);
   });
 
   const mainColumn = document.querySelector('.Question-mainColumn');
@@ -248,21 +248,35 @@ export function setupAnswerObserver(
       scrollDebounceTimer = window.setTimeout(() => {
         handleAnswersFn();
         scrollDebounceTimer = null;
-      }, 200);
+      }, 500);
     },
     { root: null, rootMargin: '0px 0px 500px 0px', threshold: 0 }
   );
 
+  let observeTimer: number | null = null;
   const observeAllAnswers = () => {
-    document.querySelectorAll('.ContentItem.AnswerItem').forEach((el) => {
-      io.observe(el);
-    });
+    if (observeTimer) {
+      clearTimeout(observeTimer);
+    }
+    observeTimer = window.setTimeout(() => {
+      document.querySelectorAll('.ContentItem.AnswerItem').forEach((el) => {
+        io.observe(el);
+      });
+      observeTimer = null;
+    }, 500);
   };
   observeAllAnswers();
 
   // 监听未来新增的回答节点，动态加入 IntersectionObserver
+  let answerListTimer: number | null = null;
   const answerListObserver = new MutationObserver(() => {
-    observeAllAnswers();
+    if (answerListTimer) {
+      clearTimeout(answerListTimer);
+    }
+    answerListTimer = window.setTimeout(() => {
+      observeAllAnswers();
+      answerListTimer = null;
+    }, 500);
   });
   if (mainColumn) {
     answerListObserver.observe(mainColumn, { childList: true, subtree: true });
@@ -272,7 +286,7 @@ export function setupAnswerObserver(
   // 知乎虚拟列表可能复用节点导致 IO 不触发，轮询确保 eventually 处理所有回答
   const pollTimer = window.setInterval(() => {
     handleAnswersFn();
-  }, 1000);
+  }, 5000);
 
   return () => {
     if (debounceTimer) {
@@ -280,6 +294,12 @@ export function setupAnswerObserver(
     }
     if (scrollDebounceTimer) {
       clearTimeout(scrollDebounceTimer);
+    }
+    if (observeTimer) {
+      clearTimeout(observeTimer);
+    }
+    if (answerListTimer) {
+      clearTimeout(answerListTimer);
     }
     clearInterval(pollTimer);
     mutationObserver.disconnect();
