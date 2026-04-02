@@ -53,25 +53,33 @@ export function SummaryButtonWrapper({
     };
   };
 
-  const handleClick = async (isManualClick: boolean = true) => {
-    const restoreSideColumn = hideSideColumn();
-    // 关闭已存在的面板，等待 cleanup 执行完成后再重新打开
-    setShowPanel(false);
-    setMarkdown('');
-    setHtml('');
+  // 点击 AI 总结按钮：切换面板开关，已有总结时只关闭，新总结时才重新请求
+  const handleButtonClick = () => {
+    if (showPanel) {
+      setShowPanel(false);
+    } else {
+      if (streaming) {
+        // 正在总结中，重新发起总结（面板打开后会显示新的流式内容）
+        startSummarize(false);
+      } else if (html || markdown) {
+        // 已有总结结果，直接打开面板
+        setShowPanel(true);
+      } else {
+        // 没有总结，发起新总结
+        startSummarize(false);
+      }
+    }
+  };
 
+  const startSummarize = async (isManualClick: boolean = true) => {
+    const restoreSideColumn = hideSideColumn();
+    setShowPanel(true);
     setLoading(true);
     setStreaming(true);
-    // 使用 setTimeout 等待面板真正卸载（cleanup 执行）后再设置 showPanel 为 true
-    setTimeout(() => {
-      setShowPanel(true);
-    }, 0);
 
-    // 获取模型名称
     const model = apiClient.modelName || 'AI';
     setModelName(model);
 
-    // 获取回答的URL（如果是回答类型）
     if (type === 'answer') {
       const answerItem = targetElement.closest('.ContentItem.AnswerItem');
       if (answerItem) {
@@ -84,14 +92,12 @@ export function SummaryButtonWrapper({
     }
 
     try {
-      // 获取内容
       const extractedContent = typeof content === 'function' ? await content() : content;
 
-      // 检查内容长度（仅对自动触发的回答）
       if (!isManualClick && type === 'answer') {
         const contentLength = extractedContent.content?.length || 0;
         if (contentLength < minLength) {
-          setHtml(`<div style="color: #666; padding: 12px; text-align: center;">回答内容较短 (${contentLength} < ${minLength}字)，可手动点击AI总结按钮触发总结</div>`);
+          setHtml(`<div style="color: #666; padding: 12px; text-align: center;">回答内容较短 (${contentLength} < ${minLength}字)，可手动点击上方重新总结按钮触发总结</div>`);
           setLoading(false);
           setStreaming(false);
           return;
@@ -108,7 +114,6 @@ export function SummaryButtonWrapper({
           const fullText = authorPrefix + fullMarkdown;
           setMarkdown(fullText);
 
-          // 流式显示时使用转义的文本
           const escaped = fullText
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -151,7 +156,7 @@ export function SummaryButtonWrapper({
   // 自动触发 - 使用 useEffect 确保只触发一次
   useEffect(() => {
     if (autoTrigger) {
-      const timer = setTimeout(() => handleClick(false), 100);
+      const timer = setTimeout(() => startSummarize(false), 100);
       return () => clearTimeout(timer);
     }
   }, [autoTrigger]);
@@ -167,7 +172,7 @@ export function SummaryButtonWrapper({
       <SummaryButton
         text="AI总结"
         loading={loading}
-        onClick={() => handleClick(true)}
+        onClick={handleButtonClick}
         className={buttonClass}
       />
       {showPanel && (
@@ -178,7 +183,7 @@ export function SummaryButtonWrapper({
           loading={loading}
           streaming={streaming}
           onClose={() => setShowPanel(false)}
-          onRefresh={() => handleClick(true)}
+          onRefresh={() => startSummarize(true)}
           title={titleMap[type]}
           panelType={type}
           targetElement={targetElement}
