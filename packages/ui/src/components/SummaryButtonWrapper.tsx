@@ -55,14 +55,17 @@ export function SummaryButtonWrapper({
 
   const handleClick = async (isManualClick: boolean = true) => {
     const restoreSideColumn = hideSideColumn();
-    // 关闭已存在的面板
+    // 关闭已存在的面板，等待 cleanup 执行完成后再重新打开
     setShowPanel(false);
     setMarkdown('');
     setHtml('');
 
     setLoading(true);
-    setShowPanel(true);
     setStreaming(true);
+    // 使用 setTimeout 等待面板真正卸载（cleanup 执行）后再设置 showPanel 为 true
+    setTimeout(() => {
+      setShowPanel(true);
+    }, 0);
 
     // 获取模型名称
     const model = apiClient.modelName || 'AI';
@@ -175,6 +178,7 @@ export function SummaryButtonWrapper({
           loading={loading}
           streaming={streaming}
           onClose={() => setShowPanel(false)}
+          onRefresh={() => handleClick(true)}
           title={titleMap[type]}
           panelType={type}
           targetElement={targetElement}

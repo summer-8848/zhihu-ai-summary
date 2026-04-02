@@ -12,6 +12,7 @@ interface SummaryPanelProps {
   loading?: boolean;
   streaming?: boolean;
   onClose: () => void;
+  onRefresh?: () => void;
   className?: string;
   title?: string;
   panelType?: 'answer' | 'article' | 'question';
@@ -25,6 +26,7 @@ export function SummaryPanel({
   loading,
   streaming,
   onClose,
+  onRefresh,
   className = '',
   title = 'AI总结',
   panelType = 'answer',
@@ -467,6 +469,15 @@ export function SummaryPanel({
               disabled={!content || streaming}
             >
               {copied ? '✅' : '📋'}
+            </button>
+            <button
+              type="button"
+              className="zhihu-ai-result-copy"
+              onClick={onRefresh}
+              title={streaming ? '请等待AI总结完成后再重新总结' : '重新总结'}
+              disabled={!content || streaming}
+            >
+              🔄
             </button>
             <button
               type="button"
