@@ -32,12 +32,40 @@ pnpm install
 
 ### 开发
 
+#### 浏览器扩展模式开发
 ```bash
-# 启动扩展开发服务器（建议使用此版本做本地开发调试）
+# 建议使用此版本做本地开发调试
 pnpm dev:extension
+```
 
-# 启动油猴脚本开发服务器
+然后在浏览器扩展程序中加载 `packages\extension\dist\chrome-mv3-dev`
+
+#### 油猴脚本模式开发
+```bash
 pnpm dev:userscript
+```
+
+在油猴脚本中，创建一个新的脚本，填写下方代码，注意将 `require` 换成自己本机实际打包后的路径
+
+```js
+// ==UserScript==
+// @name         知乎AI总结助手 - 油猴脚本版(by Summer121) - 本地测试
+// @namespace    http://tampermonkey.net/
+// @version      2.3.0
+// @author       Summer121
+// @description  知乎中的文章、问题和回答提供 AI 智能总结功能
+// @license      MIT
+// @match        https://*.zhihu.com/*
+// @connect      localhost
+// @connect      *
+// @grant        GM_addStyle
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_xmlhttpRequest
+// @grant        unsafeWindow
+// @run-at       document-idle
+// @require      file:///d:/projects/zhihu-ai-summary/packages/userscript/dist/zhihu-ai-summary.user.js
+// ==/UserScript==
 ```
 
 ### 构建

@@ -1,6 +1,8 @@
 # idea
 .vscode
 .idea
+.crush
+.claude
 
 # files
 node_modules
@@ -12,6 +14,7 @@ dist
 .DS_Store
 nul
 vite.config.ts.timestamp-*.mjs
+config.json
 
 # md files
 *.md
