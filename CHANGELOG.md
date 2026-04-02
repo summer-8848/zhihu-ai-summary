@@ -1,6 +1,19 @@
 # Changelog
 
 
+## [2.5.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.4.1...v2.5.0) (2026-04-02)
+
+
+### Features
+
+* 总结面板增加刷新按钮，点击后重新总结 ([f312731](https://github.com/summer-8848/zhihu-ai-summary/commit/f312731fea794d52bd47a1cc490c9b180dc30a08))
+* AI总结按钮改为切换面板开关，保留已有总结结果 ([f5cb3b8](https://github.com/summer-8848/zhihu-ai-summary/commit/f5cb3b80fbc19bdd11ff04f5d46b5553efe01517))
+
+
+### Bug Fixes
+
+* 添加账号时,URL已包含v1则不再强制追加v1/chat/completions ([14ce2cf](https://github.com/summer-8848/zhihu-ai-summary/commit/14ce2cf4d863331bc545fd5d4fa6a426711cc829))
+
 ## [2.4.1](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.4.0...v2.4.1) (2026-04-02)
 
 
