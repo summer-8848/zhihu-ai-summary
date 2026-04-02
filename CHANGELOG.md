@@ -1,6 +1,18 @@
 # Changelog
 
 
+## [2.4.1](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.4.0...v2.4.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* 修复油猴脚本版设置页面不显示 appName 和作者的问题 ([fe0e99b](https://github.com/summer-8848/zhihu-ai-summary/commit/fe0e99b59e84485499da6008d7ac85aba8d40ebd))
+
+
+### Chores
+
+* 完善开发说明 ([9fb6029](https://github.com/summer-8848/zhihu-ai-summary/commit/9fb6029d49150eb219afcabb826f8e02f0638c6f))
+
 ## [2.4.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.3.0...v2.4.0) (2026-03-19)
 
 
