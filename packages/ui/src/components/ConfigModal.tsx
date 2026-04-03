@@ -564,6 +564,29 @@ function AccountFormModal({
                 onInput={(e) => setFormData({ ...formData, apiUrl: (e.target as HTMLInputElement).value })}
                 onBlur={normalizeApiUrlInForm}
               />
+              <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
+                {['/v1/chat/completions', '/v1/completions'].map((suffix) => (
+                  <button
+                    key={suffix}
+                    type="button"
+                    onClick={() => {
+                      const base = formData.apiUrl.trim().replace(/\/+$/, '');
+                      setFormData((prev) => ({ ...prev, apiUrl: base + suffix }));
+                    }}
+                    style={{
+                      padding: '2px 8px',
+                      fontSize: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '4px',
+                      background: '#f5f5f5',
+                      cursor: 'pointer',
+                      color: '#666',
+                    }}
+                  >
+                    {suffix}
+                  </button>
+                ))}
+              </div>
             </div>
              <div className="zhihu-ai-config-item">
               <label className="zhihu-ai-config-label" htmlFor="zhihu-ai-account-name">备注名称:</label>
