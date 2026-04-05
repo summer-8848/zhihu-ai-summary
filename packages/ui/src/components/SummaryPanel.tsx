@@ -507,7 +507,7 @@ export function SummaryPanel({
         <div className="zhihu-ai-answer-result-body">
           {cachedAt && (
             <div style={{ fontSize: '12px', color: '#999', padding: '4px 0', marginBottom: '4px', borderBottom: '1px solid #eee' }}>
-              来自缓存 · {formatCachedTime(cachedAt)}
+              来自缓存 · {formatCachedTime(cachedAt)}，点击上方刷新按钮可重新总结
             </div>
           )}
           {!content && loading ? (

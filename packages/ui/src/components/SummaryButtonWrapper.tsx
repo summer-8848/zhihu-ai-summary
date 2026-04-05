@@ -75,7 +75,7 @@ export function SummaryButtonWrapper({
     }
   };
 
-  const startSummarize = async (isManualClick: boolean = true) => {
+  const startSummarize = async (isManualClick: boolean = true, skipCache: boolean = false) => {
     cacheSavedRef.current = false;
     const restoreSideColumn = hideSideColumn();
     setShowPanel(true);
@@ -115,17 +115,20 @@ export function SummaryButtonWrapper({
 
       // 基于 URL + 类型生成缓存键
       const cacheKey = `${answerUrl}:${type}`;
-      const cached = await configManager.getCachedSummary(cacheKey);
 
-      if (cached) {
-        const cachedHtml = MarkdownParser.parse(cached.markdown);
-        setMarkdown(cached.markdown);
-        setHtml(cachedHtml);
-        setCachedAt(cached.timestamp);
-        setLoading(false);
-        setStreaming(false);
-        restoreSideColumn();
-        return;
+      // 非手动触发且未强制跳过缓存时，先尝试从缓存读取
+      if (!isManualClick && !skipCache) {
+        const cached = await configManager.getCachedSummary(cacheKey);
+        if (cached) {
+          const cachedHtml = MarkdownParser.parse(cached.markdown);
+          setMarkdown(cached.markdown);
+          setHtml(cachedHtml);
+          setCachedAt(cached.timestamp);
+          setLoading(false);
+          setStreaming(false);
+          restoreSideColumn();
+          return;
+        }
       }
 
       let fullMarkdown = '';
@@ -221,7 +224,7 @@ export function SummaryButtonWrapper({
           streaming={streaming}
           cachedAt={cachedAt}
           onClose={() => setShowPanel(false)}
-          onRefresh={() => startSummarize(true)}
+          onRefresh={() => startSummarize(true, true)}
           title={titleMap[type]}
           panelType={type}
           targetElement={targetElement}
