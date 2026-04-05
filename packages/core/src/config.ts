@@ -86,12 +86,11 @@ export class ConfigManager {
   }
 
   async exportConfig(): Promise<string> {
-    const configs: ConfigValueMap = {
+    const configs = {
       AI_ACCOUNTS: (await this.get('AI_ACCOUNTS', [])) ?? [],
       CURRENT_ACCOUNT_ID: (await this.get('CURRENT_ACCOUNT_ID', '')) ?? '',
       AUTO_SUMMARIZE: (await this.get('AUTO_SUMMARIZE', false)) ?? false,
       MIN_ANSWER_LENGTH: (await this.get('MIN_ANSWER_LENGTH', 200)) ?? 200,
-      SUMMARY_CACHE: (await this.get('SUMMARY_CACHE', {})) ?? {},
       SUMMARY_CACHE_SIZE: (await this.get('SUMMARY_CACHE_SIZE', 100)) ?? 100,
     };
     return JSON.stringify(configs, null, 2);
