@@ -1,6 +1,33 @@
 # Changelog
 
 
+## [2.6.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.5.0...v2.6.0) (2026-04-05)
+
+
+### Features
+
+* 缓存命中时在内容顶部显示缓存时间 ([730998b](https://github.com/summer-8848/zhihu-ai-summary/commit/730998bea40ea0e404ffb428b7bde85a44e54c1e))
+* 设置页面改为卡片式布局，缓存按钮调整位置 ([14246e9](https://github.com/summer-8848/zhihu-ai-summary/commit/14246e9291017c115501b2e5bd284d04cd8b6fe9))
+* 添加账号时不再自动追加v1/chat/completions，改为可选后缀按钮 ([15f3599](https://github.com/summer-8848/zhihu-ai-summary/commit/15f3599bc6da6378602416b3ba84e9951e0a4c64))
+
+
+### Bug Fixes
+
+* 导出配置时排除 SUMMARY_CACHE 缓存记录 ([917f158](https://github.com/summer-8848/zhihu-ai-summary/commit/917f15810df6b13dbf14dff8ce063b3c57c306db))
+* 刷新时跳过缓存直接请求大模型 ([1e0a09a](https://github.com/summer-8848/zhihu-ai-summary/commit/1e0a09a1e650daa1464336e006f15203732a9a50))
+* 限制油猴脚本仅在指定知乎页面运行 ([25f793c](https://github.com/summer-8848/zhihu-ai-summary/commit/25f793c13866c4376cea315ba926722b30722b82))
+* 修复 max_tokens=0 导致 HTTP 400，扩展改用 chrome.storage.local ([15fe3e7](https://github.com/summer-8848/zhihu-ai-summary/commit/15fe3e777b2c783bb0dd379adda1334173af7543))
+
+
+### Styles
+
+* 优化设置页面布局，自动总结和缓存卡片并排展示 ([3a0fdf5](https://github.com/summer-8848/zhihu-ai-summary/commit/3a0fdf5f2cf3d762eaa0158755fc1a1297c1e85d))
+
+
+### Chores
+
+* 限制浏览器插件仅在指定知乎页面运行 ([95c0216](https://github.com/summer-8848/zhihu-ai-summary/commit/95c021639c18b857c03153616ea55894c5744247))
+
 ## [2.5.0](https://github.com/summer-8848/zhihu-ai-summary/compare/v2.4.1...v2.5.0) (2026-04-02)
 
 
