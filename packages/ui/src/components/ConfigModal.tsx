@@ -19,7 +19,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
   const version = import.meta.env.VITE_APP_VERSION;
   const author = import.meta.env.VITE_APP_AUTHOR;
   const homepage = import.meta.env.VITE_APP_HOMEPAGE;
-  
+
   const [activeTab, setActiveTab] = useState<TabType>('accounts');
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [currentAccountId, setCurrentAccountId] = useState<string>('');
@@ -217,311 +217,311 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
           onClick={onClose}
         />
         <div className="zhihu-ai-modal-content" role="dialog" aria-modal="true" aria-label={appName} tabIndex={-1}>
-        <div className="zhihu-ai-modal-header">
-          <div className="zhihu-ai-modal-title">
-            <svg width="24" height="24" viewBox="0 0 1024 1024" fill="#1772f6">
-              <title>{appName}</title>
-              <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/>
-              <path d="M464 336a48 48 0 1 0 96 0 48 48 0 1 0-96 0z m72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z"/>
-            </svg>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              <div style={{ fontSize: '16px', fontWeight: 600, color: '#1a1a1a' }}>
-                {appName}
-              </div>
-              <div style={{ fontSize: '12px', color: '#8a8a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>作者: {author}</span>
-                <span>•</span>
-                <a
-                  href={homepage}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ 
-                    color: '#1772f6', 
-                    textDecoration: 'none',
-                    cursor: 'pointer'
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  v{version}
-                </a>
+          <div className="zhihu-ai-modal-header">
+            <div className="zhihu-ai-modal-title">
+              <svg width="24" height="24" viewBox="0 0 1024 1024" fill="#1772f6">
+                <title>{appName}</title>
+                <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z" />
+                <path d="M464 336a48 48 0 1 0 96 0 48 48 0 1 0-96 0z m72 112h-48c-4.4 0-8 3.6-8 8v272c0 4.4 3.6 8 8 8h48c4.4 0 8-3.6 8-8V456c0-4.4-3.6-8-8-8z" />
+              </svg>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <div style={{ fontSize: '16px', fontWeight: 600, color: '#1a1a1a' }}>
+                  {appName}
+                </div>
+                <div style={{ fontSize: '12px', color: '#8a8a8a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>作者: {author}</span>
+                  <span>•</span>
+                  <a
+                    href={homepage}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: '#1772f6',
+                      textDecoration: 'none',
+                      cursor: 'pointer'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    v{version}
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-          <button type="button" className="zhihu-ai-modal-close" onClick={onClose} aria-label="关闭">×</button>
-        </div>
-
-        <div className="zhihu-ai-modal-body">
-          <div className="zhihu-ai-tabs">
-            <button
-              type="button"
-              className={`zhihu-ai-tab ${activeTab === 'data' ? 'active' : ''}`}
-              onClick={() => setActiveTab('data')}
-              onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('data'))}
-            >
-              配置
-            </button>
-            <button
-              type="button"
-              className={`zhihu-ai-tab ${activeTab === 'accounts' ? 'active' : ''}`}
-              onClick={() => setActiveTab('accounts')}
-              onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('accounts'))}
-            >
-              账号
-            </button>
-            <button
-              type="button"
-              className={`zhihu-ai-tab ${activeTab === 'settings' ? 'active' : ''}`}
-              onClick={() => setActiveTab('settings')}
-              onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('settings'))}
-            >
-              设置
-            </button>
+            <button type="button" className="zhihu-ai-modal-close" onClick={onClose} aria-label="关闭">×</button>
           </div>
 
-          {activeTab === 'accounts' && (
-            <div className="zhihu-ai-tab-content active">
-              <div className="zhihu-ai-account-list">
-                {accounts.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: '#999' }}>
-                    暂无账号，请添加新账号
-                  </div>
-                ) : (
-                  accounts.map(account => (
-                    <div
-                      key={account.id}
-                      className={`zhihu-ai-account-item ${account.id === currentAccountId ? 'active' : ''}`}
-                    >
-                      <button
-                        type="button"
-                        className="zhihu-ai-account-select"
-                        onClick={() => handleSelectAccount(account.id)}
-                        onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => handleSelectAccount(account.id))}
-                      >
-                        <div className="zhihu-ai-account-info">
-                          <div className="zhihu-ai-account-name">{account.name}</div>
-                          <div className="zhihu-ai-account-detail">
-                            {account.model} • {account.apiUrl.length > 40 ? account.apiUrl.substring(0, 40) + '...' : account.apiUrl}
-                          </div>
-                        </div>
-                      </button>
-                      <div className="zhihu-ai-account-actions">
-                        <button
-                          type="button"
-                          className="zhihu-ai-account-btn zhihu-ai-account-btn-copy"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setCopyingAccountId(account.id);
-                            setShowAccountForm(true);
-                          }}
-                        >
-                          复制
-                        </button>
-                        <button
-                          type="button"
-                          className="zhihu-ai-account-btn zhihu-ai-account-btn-edit"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingAccountId(account.id);
-                            setShowAccountForm(true);
-                          }}
-                        >
-                          编辑
-                        </button>
-                        <button
-                          type="button"
-                          className="zhihu-ai-account-btn zhihu-ai-account-btn-delete"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteAccount(account.id);
-                          }}
-                        >
-                          删除
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+          <div className="zhihu-ai-modal-body">
+            <div className="zhihu-ai-tabs">
               <button
                 type="button"
-                className="zhihu-ai-add-account-btn"
-                onClick={() => {
-                  setEditingAccountId(null);
-                  setCopyingAccountId(null);
-                  setShowAccountForm(true);
-                }}
+                className={`zhihu-ai-tab ${activeTab === 'data' ? 'active' : ''}`}
+                onClick={() => setActiveTab('data')}
+                onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('data'))}
               >
-                + 添加新账号
+                配置
+              </button>
+              <button
+                type="button"
+                className={`zhihu-ai-tab ${activeTab === 'accounts' ? 'active' : ''}`}
+                onClick={() => setActiveTab('accounts')}
+                onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('accounts'))}
+              >
+                账号
+              </button>
+              <button
+                type="button"
+                className={`zhihu-ai-tab ${activeTab === 'settings' ? 'active' : ''}`}
+                onClick={() => setActiveTab('settings')}
+                onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('settings'))}
+              >
+                设置
               </button>
             </div>
-          )}
 
-          {activeTab === 'data' && (
-            <div className="zhihu-ai-tab-content active">
-              <div className="zhihu-ai-config-panel">
-                <div className="zhihu-ai-config-item">
-                  <div className="zhihu-ai-config-label">导入导出配置</div>
-                  <div className="zhihu-ai-config-btn-group" style={{ marginTop: '8px' }}>
-                    <button
-                      type="button"
-                      className="zhihu-ai-config-btn-half zhihu-ai-config-btn-secondary"
-                      onClick={handleExportConfig}
-                    >
-                      📋 复制配置
-                    </button>
-                    <button
-                      type="button"
-                      className="zhihu-ai-config-btn-half zhihu-ai-config-btn-warning"
-                      onClick={() => setShowImportModal(true)}
-                    >
-                      📥 导入配置
-                    </button>
-                  </div>
-                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
-                    导入配置将覆盖现有设置，确定要继续吗？
+            {activeTab === 'accounts' && (
+              <div className="zhihu-ai-tab-content active">
+                <div className="zhihu-ai-account-list">
+                  {accounts.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '40px 20px', color: '#999' }}>
+                      暂无账号，请添加新账号
+                    </div>
+                  ) : (
+                    accounts.map(account => (
+                      <div
+                        key={account.id}
+                        className={`zhihu-ai-account-item ${account.id === currentAccountId ? 'active' : ''}`}
+                      >
+                        <button
+                          type="button"
+                          className="zhihu-ai-account-select"
+                          onClick={() => handleSelectAccount(account.id)}
+                          onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => handleSelectAccount(account.id))}
+                        >
+                          <div className="zhihu-ai-account-info">
+                            <div className="zhihu-ai-account-name">{account.name}</div>
+                            <div className="zhihu-ai-account-detail">
+                              {account.model} • {account.apiUrl.length > 40 ? account.apiUrl.substring(0, 40) + '...' : account.apiUrl}
+                            </div>
+                          </div>
+                        </button>
+                        <div className="zhihu-ai-account-actions">
+                          <button
+                            type="button"
+                            className="zhihu-ai-account-btn zhihu-ai-account-btn-copy"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCopyingAccountId(account.id);
+                              setShowAccountForm(true);
+                            }}
+                          >
+                            复制
+                          </button>
+                          <button
+                            type="button"
+                            className="zhihu-ai-account-btn zhihu-ai-account-btn-edit"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingAccountId(account.id);
+                              setShowAccountForm(true);
+                            }}
+                          >
+                            编辑
+                          </button>
+                          <button
+                            type="button"
+                            className="zhihu-ai-account-btn zhihu-ai-account-btn-delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteAccount(account.id);
+                            }}
+                          >
+                            删除
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="zhihu-ai-add-account-btn"
+                  onClick={() => {
+                    setEditingAccountId(null);
+                    setCopyingAccountId(null);
+                    setShowAccountForm(true);
+                  }}
+                >
+                  + 添加新账号
+                </button>
+              </div>
+            )}
+
+            {activeTab === 'data' && (
+              <div className="zhihu-ai-tab-content active">
+                <div className="zhihu-ai-config-panel">
+                  <div className="zhihu-ai-config-item">
+                    <div className="zhihu-ai-config-label">导入导出配置</div>
+                    <div className="zhihu-ai-config-btn-group" style={{ marginTop: '8px' }}>
+                      <button
+                        type="button"
+                        className="zhihu-ai-config-btn-half zhihu-ai-config-btn-secondary"
+                        onClick={handleExportConfig}
+                      >
+                        📋 复制配置
+                      </button>
+                      <button
+                        type="button"
+                        className="zhihu-ai-config-btn-half zhihu-ai-config-btn-warning"
+                        onClick={() => setShowImportModal(true)}
+                      >
+                        📥 导入配置
+                      </button>
+                    </div>
+                    <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                      导入配置将覆盖现有设置，确定要继续吗？
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {activeTab === 'settings' && (
-            <div className="zhihu-ai-tab-content active">
-              <div className="zhihu-ai-config-panel" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-                {/* 区块1: 自动总结 - 带边框的卡片 */}
-                <div style={{ border: '1px solid #e5e5e5', borderRadius: '8px', padding: '16px', background: '#fff' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', marginBottom: '12px' }}>自动总结</div>
-                  <div className="zhihu-ai-config-item" style={{ marginBottom: '12px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px' }}>
-                      <input
-                        type="checkbox"
-                        checked={autoSummarize}
-                        onChange={(e) => setAutoSummarize((e.target as HTMLInputElement).checked)}
-                      />
-                      <span style={{ fontSize: '13px', color: '#333' }}>自动总结</span>
-                    </label>
-                    <div style={{ fontSize: '12px', color: '#666', marginTop: '4px', marginLeft: '24px' }}>
-                      页面加载后自动调用AI总结文章和问题中的各个回答
-                    </div>
-                  </div>
-                  <div className="zhihu-ai-config-item" style={{ marginBottom: 0 }}>
-                    <label style={{ fontSize: '13px', color: '#333', marginBottom: '6px', display: 'block' }}>回答最少字数</label>
-                    <input
-                      type="number"
-                      className="zhihu-ai-config-input"
-                      value={minAnswerLength}
-                      min="0"
-                      placeholder="200"
-                      style={{ width: '100%', fontSize: '13px', padding: '8px 10px' }}
-                      onInput={(e) => setMinAnswerLength(parseInt((e.target as HTMLInputElement).value) || 200)}
-                    />
-                    <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                      回答字数少于此值时不自动总结
-                    </div>
-                  </div>
-                </div>
-
-                {/* 区块2: 缓存管理 - 带边框的卡片 */}
-                <div style={{ border: '1px solid #e5e5e5', borderRadius: '8px', padding: '16px', background: '#fff' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', marginBottom: '12px' }}>缓存</div>
-                  <div className="zhihu-ai-config-item" style={{ marginBottom: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <label style={{ fontSize: '13px', color: '#333' }}>最大条数</label>
+            {activeTab === 'settings' && (
+              <div className="zhihu-ai-tab-content active">
+                <div className="zhihu-ai-config-panel" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: '280px', border: '1px solid #e5e5e5', borderRadius: '8px', padding: '16px', background: '#fff' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', marginBottom: '12px' }}>自动总结</div>
+                      <div className="zhihu-ai-config-item" style={{ marginBottom: '12px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px' }}>
+                          <input
+                            type="checkbox"
+                            checked={autoSummarize}
+                            onChange={(e) => setAutoSummarize((e.target as HTMLInputElement).checked)}
+                          />
+                          <span style={{ fontSize: '13px', color: '#333' }}>自动总结</span>
+                        </label>
+                        <div style={{ fontSize: '12px', color: '#666', marginTop: '4px', marginLeft: '24px' }}>
+                          页面加载后自动调用AI总结文章和问题中的各个回答
+                        </div>
+                      </div>
+                      <div className="zhihu-ai-config-item" style={{ marginBottom: 0 }}>
+                        <label style={{ fontSize: '13px', color: '#333', marginBottom: '6px', display: 'block' }}>回答最少字数</label>
                         <input
                           type="number"
                           className="zhihu-ai-config-input"
-                          value={cacheSize}
+                          value={minAnswerLength}
                           min="0"
-                          max="1000"
-                          style={{ width: '80px', fontSize: '13px', padding: '6px 8px' }}
-                          onInput={(e) => setCacheSize(parseInt((e.target as HTMLInputElement).value) || 100)}
+                          placeholder="200"
+                          style={{ width: '95%', fontSize: '13px', padding: '8px 10px' }}
+                          onInput={(e) => setMinAnswerLength(parseInt((e.target as HTMLInputElement).value) || 200)}
                         />
+                        <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                          回答字数少于此值时不自动总结
+                        </div>
                       </div>
-                      <span style={{ fontSize: '12px', color: '#666' }}>
-                        已缓存 {cacheCount} 条 ({cacheStorageSize})
-                      </span>
-                      <button
-                        type="button"
-                        className="zhihu-ai-config-btn zhihu-ai-config-btn-warning"
-                        style={{ padding: '4px 12px', fontSize: '12px' }}
-                        onClick={async () => {
-                          const ok = await confirm({
-                            title: '清空缓存',
-                            message: `确定要清空所有已缓存的 ${cacheCount} 条总结结果吗？`,
-                            confirmText: '清空',
-                            cancelText: '取消',
-                            danger: true,
-                          });
-                          if (ok) {
-                            await configManager.clearCache();
-                            setCacheCount(0);
-                            setCacheStorageSize('0 B');
-                            toast.success('缓存已清空');
-                          }
-                        }}
-                      >
-                        清空缓存
-                      </button>
+                    </div>
+                    <div style={{ flex: 1, minWidth: '280px', border: '1px solid #e5e5e5', borderRadius: '8px', padding: '16px', background: '#fff' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', marginBottom: '12px' }}>缓存</div>
+                      <div className="zhihu-ai-config-item" style={{ marginBottom: '8px' }}>
+                        <div style={{ fontSize: '12px', color: '#666' }}>
+                          缓存已总结的结果，下次访问相同内容时直接显示
+                        </div>
+                      </div>
+                      <div className="zhihu-ai-config-item" style={{ marginBottom: '8px' }}>
+                        <div>
+                          <label style={{ fontSize: '13px', color: '#333', display: 'block' }}>最大条数</label>
+                          <input
+                            type="number"
+                            className="zhihu-ai-config-input"
+                            value={cacheSize}
+                            min="0"
+                            max="1000"
+                            style={{ width: '95%', fontSize: '13px', padding: '6px 8px' }}
+                            onInput={(e) => setCacheSize(parseInt((e.target as HTMLInputElement).value) || 100)}
+                          />
+                        </div>
+                      </div>
+                      <div className="zhihu-ai-config-item" style={{ marginBottom: '8px' }}>
+                        <div style={{ fontSize: '12px', color: '#666' }}>
+                          已缓存 {cacheCount} 条 (占用{cacheStorageSize})
+                        </div>
+                      </div>
+                      <div className="zhihu-ai-config-item" style={{ marginBottom: 0 }}>
+                        <button
+                          type="button"
+                          className="zhihu-ai-config-btn-warning"
+                          style={{ padding: '6px 16px', fontSize: '13px' }}
+                          onClick={async () => {
+                            const ok = await confirm({
+                              title: '清空缓存',
+                              message: `确定要清空所有已缓存的 ${cacheCount} 条总结结果吗？`,
+                              confirmText: '清空',
+                              cancelText: '取消',
+                              danger: true,
+                            });
+                            if (ok) {
+                              await configManager.clearCache();
+                              setCacheCount(0);
+                              setCacheStorageSize('0 B');
+                              toast.success('缓存已清空');
+                            }
+                          }}
+                        >
+                          清空缓存
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="zhihu-ai-config-item" style={{ marginBottom: 0 }}>
-                    <div style={{ fontSize: '12px', color: '#666' }}>
-                      缓存已总结的结果，下次访问相同内容时直接显示
-                    </div>
-                  </div>
-                </div>
 
-                {/* 保存按钮 */}
-                <div className="zhihu-ai-config-item">
-                  <button type="button" className="zhihu-ai-config-save" onClick={handleSaveSettings} style={{ width: '100%', padding: '12px', fontSize: '14px' }}>
-                    保存设置
-                  </button>
+                  {/* 保存按钮 */}
+                  <div className="zhihu-ai-config-item">
+                    <button type="button" className="zhihu-ai-config-save" onClick={handleSaveSettings} style={{ width: '100%', padding: '12px', fontSize: '14px' }}>
+                      保存设置
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
+          </div>
         </div>
       </div>
-    </div>
 
-    {showAccountForm && (
-      <AccountFormModal
-        configManager={configManager}
-        apiClient={apiClient}
-        accounts={accounts}
-        editingAccountId={editingAccountId}
-        copyingAccountId={copyingAccountId}
-        onClose={() => {
-          setShowAccountForm(false);
-          setEditingAccountId(null);
-          setCopyingAccountId(null);
-        }}
-        onSave={async () => {
-          await loadConfig();
-          setShowAccountForm(false);
-          setEditingAccountId(null);
-          setCopyingAccountId(null);
-        }}
-      />
-    )}
+      {showAccountForm && (
+        <AccountFormModal
+          configManager={configManager}
+          apiClient={apiClient}
+          accounts={accounts}
+          editingAccountId={editingAccountId}
+          copyingAccountId={copyingAccountId}
+          onClose={() => {
+            setShowAccountForm(false);
+            setEditingAccountId(null);
+            setCopyingAccountId(null);
+          }}
+          onSave={async () => {
+            await loadConfig();
+            setShowAccountForm(false);
+            setEditingAccountId(null);
+            setCopyingAccountId(null);
+          }}
+        />
+      )}
 
-    {showImportModal && (
-      <InputModal
-        title="导入配置"
-        placeholder="请粘贴配置 JSON..."
-        multiline={true}
-        rows={15}
-        onConfirm={(value) => {
-          setShowImportModal(false);
-          handleImportConfig(value);
-        }}
-        onCancel={() => setShowImportModal(false)}
-      />
-    )}
-  </>
+      {showImportModal && (
+        <InputModal
+          title="导入配置"
+          placeholder="请粘贴配置 JSON..."
+          multiline={true}
+          rows={15}
+          onConfirm={(value) => {
+            setShowImportModal(false);
+            handleImportConfig(value);
+          }}
+          onCancel={() => setShowImportModal(false)}
+        />
+      )}
+    </>
   );
 }
 
@@ -547,8 +547,8 @@ function AccountFormModal({
   const sourceAccount = copyingAccountId
     ? accounts.find(acc => acc.id === copyingAccountId)
     : editingAccountId
-    ? accounts.find(acc => acc.id === editingAccountId)
-    : null;
+      ? accounts.find(acc => acc.id === editingAccountId)
+      : null;
 
   const [formData, setFormData] = useState({
     name: copyingAccountId && sourceAccount ? `${sourceAccount.name} (副本)` : sourceAccount?.name || '',
@@ -685,7 +685,7 @@ function AccountFormModal({
                 ))}
               </div>
             </div>
-             <div className="zhihu-ai-config-item">
+            <div className="zhihu-ai-config-item">
               <label className="zhihu-ai-config-label" htmlFor="zhihu-ai-account-name">备注名称:</label>
               <input
                 id="zhihu-ai-account-name"

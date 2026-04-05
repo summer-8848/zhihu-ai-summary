@@ -469,7 +469,7 @@
 }
 
 .zhihu-ai-config-panel {
-  padding: 20px 0;
+  padding: 0;
 }
 
 .zhihu-ai-config-item {
@@ -720,6 +720,8 @@
 
 .zhihu-ai-config-btn-warning {
   background: linear-gradient(135deg, #fa8c16 0%, #d46b08 100%);
+  border-radius: 8px;
+  color: #fff;
 }
 
 .zhihu-ai-config-btn-warning:hover {
