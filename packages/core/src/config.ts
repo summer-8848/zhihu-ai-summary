@@ -13,12 +13,20 @@ export interface Account {
   model: string;
 }
 
+// 缓存的总结结果（只存 markdown，HTML 读取时动态生成）
+export interface CachedSummary {
+  markdown: string;
+  timestamp: number;
+}
+
 // 配置键到值的映射（用于强类型 get/set）
 export interface ConfigValueMap {
   AI_ACCOUNTS: Account[];
   CURRENT_ACCOUNT_ID: string;
   AUTO_SUMMARIZE: boolean;
   MIN_ANSWER_LENGTH: number;
+  SUMMARY_CACHE: Record<string, CachedSummary>;
+  SUMMARY_CACHE_SIZE: number;
 }
 
 export type ConfigKey = keyof ConfigValueMap;
@@ -83,6 +91,8 @@ export class ConfigManager {
       CURRENT_ACCOUNT_ID: (await this.get('CURRENT_ACCOUNT_ID', '')) ?? '',
       AUTO_SUMMARIZE: (await this.get('AUTO_SUMMARIZE', false)) ?? false,
       MIN_ANSWER_LENGTH: (await this.get('MIN_ANSWER_LENGTH', 200)) ?? 200,
+      SUMMARY_CACHE: (await this.get('SUMMARY_CACHE', {})) ?? {},
+      SUMMARY_CACHE_SIZE: (await this.get('SUMMARY_CACHE_SIZE', 100)) ?? 100,
     };
     return JSON.stringify(configs, null, 2);
   }
@@ -103,5 +113,67 @@ export class ConfigManager {
     await this.set('CURRENT_ACCOUNT_ID', '');
     await this.set('AUTO_SUMMARIZE', false);
     await this.set('MIN_ANSWER_LENGTH', 200);
+  }
+
+  // 获取缓存的总结结果
+  async getCachedSummary(key: string): Promise<CachedSummary | null> {
+    const cache = await this.get('SUMMARY_CACHE', {});
+    return cache[key] || null;
+  }
+
+  // 保存总结结果到缓存
+  async setCachedSummary(key: string, summary: CachedSummary): Promise<void> {
+    const cache = await this.get('SUMMARY_CACHE', {});
+    const maxSize = await this.get('SUMMARY_CACHE_SIZE', 100);
+
+    // 如果已存在该键，先删除（以便更新顺序）
+    if (cache[key]) {
+      delete cache[key];
+    }
+
+    // 添加到缓存末尾（最新）
+    cache[key] = summary;
+
+    // 超过最大数量，删除最旧的（LRU）
+    const keys = Object.keys(cache);
+    while (keys.length > maxSize) {
+      const oldestKey = keys.shift();
+      if (oldestKey) {
+        delete cache[oldestKey];
+      }
+    }
+
+    await this.set('SUMMARY_CACHE', cache);
+  }
+
+  // 获取缓存条目数
+  async getCacheCount(): Promise<number> {
+    const cache = await this.get('SUMMARY_CACHE', {});
+    return Object.keys(cache).length;
+  }
+
+  // 获取缓存占用空间大小
+  async getCacheStorageSize(): Promise<string> {
+    const cache = await this.get('SUMMARY_CACHE', {});
+    const bytes = new TextEncoder().encode(JSON.stringify(cache)).length;
+    if (bytes < 1024) {
+      return `${bytes} B`;
+    } else if (bytes < 1024 * 1024) {
+      return `${(bytes / 1024).toFixed(1)} KB`;
+    } else {
+      return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+    }
+  }
+
+  // 根据存储限制返回建议的最大缓存条数
+  // userscript: GM_setValue 单条限制 ~1MB
+  // extension: chrome.storage.local 单条限制 ~10MB
+  async getRecommendedCacheSize(): Promise<number> {
+    return 100; // 默认 100 条足够（单条 markdown 通常几 KB）
+  }
+
+  // 清空所有缓存
+  async clearCache(): Promise<void> {
+    await this.set('SUMMARY_CACHE', {});
   }
 }

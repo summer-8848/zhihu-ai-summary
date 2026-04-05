@@ -25,6 +25,9 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
   const [currentAccountId, setCurrentAccountId] = useState<string>('');
   const [autoSummarize, setAutoSummarize] = useState(false);
   const [minAnswerLength, setMinAnswerLength] = useState(200);
+  const [cacheSize, setCacheSize] = useState(100);
+  const [cacheCount, setCacheCount] = useState(0);
+  const [cacheStorageSize, setCacheStorageSize] = useState('');
   const [showAccountForm, setShowAccountForm] = useState(false);
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
   const [copyingAccountId, setCopyingAccountId] = useState<string | null>(null);
@@ -32,6 +35,14 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
 
   useEffect(() => {
     loadConfig();
+    // 定期刷新缓存条数和占用空间
+    const timer = setInterval(async () => {
+      const count = await configManager.getCacheCount();
+      const size = await configManager.getCacheStorageSize();
+      setCacheCount(count);
+      setCacheStorageSize(size);
+    }, 2000);
+    return () => clearInterval(timer);
   }, []);
 
   const loadConfig = async () => {
@@ -39,11 +50,17 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
     const currentId = await configManager.get('CURRENT_ACCOUNT_ID', '');
     const autoSum = await configManager.get('AUTO_SUMMARIZE', false);
     const minLen = await configManager.get('MIN_ANSWER_LENGTH', 200);
+    const cachedSize = await configManager.get('SUMMARY_CACHE_SIZE', 100);
+    const cachedCount = await configManager.getCacheCount();
+    const storageSize = await configManager.getCacheStorageSize();
 
     setAccounts(accs);
     setCurrentAccountId(currentId);
     setAutoSummarize(autoSum);
     setMinAnswerLength(minLen);
+    setCacheSize(cachedSize);
+    setCacheCount(cachedCount);
+    setCacheStorageSize(storageSize);
   };
 
   const handleSelectAccount = async (accountId: string) => {
@@ -108,7 +125,8 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
     try {
       const ok1 = await configManager.set('AUTO_SUMMARIZE', autoSummarize);
       const ok2 = await configManager.set('MIN_ANSWER_LENGTH', minAnswerLength);
-      if (!ok1 || !ok2) {
+      const ok3 = await configManager.set('SUMMARY_CACHE_SIZE', cacheSize);
+      if (!ok1 || !ok2 || !ok3) {
         toast.error('设置保存失败');
         return;
       }
@@ -377,6 +395,46 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
                       📥 导入配置
                     </button>
                   </div>
+                </div>
+                <div className="zhihu-ai-config-item">
+                  <label className="zhihu-ai-config-label" htmlFor="zhihu-ai-cache-size">缓存条数:</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                      type="number"
+                      className="zhihu-ai-config-input"
+                      id="zhihu-ai-cache-size"
+                      value={cacheSize}
+                      min="0"
+                      max="1000"
+                      style={{ width: '100px' }}
+                      onInput={(e) => setCacheSize(parseInt((e.target as HTMLInputElement).value) || 100)}
+                    />
+                    <span style={{ fontSize: '12px', color: '#666' }}>条（已缓存 {cacheCount} 条，共 {cacheStorageSize}）</span>
+                  </div>
+                  <div style={{ marginTop: '6px', fontSize: '12px', color: '#666' }}>
+                    缓存已总结的结果，下次访问相同内容时直接显示
+                  </div>
+                  <button
+                    type="button"
+                    className="zhihu-ai-config-btn-half zhihu-ai-config-btn-warning"
+                    style={{ marginTop: '8px' }}
+                    onClick={async () => {
+                      const ok = await confirm({
+                        title: '清空缓存',
+                        message: `确定要清空所有已缓存的 ${cacheCount} 条总结结果吗？`,
+                        confirmText: '清空',
+                        cancelText: '取消',
+                        danger: true,
+                      });
+                      if (ok) {
+                        await configManager.clearCache();
+                        setCacheCount(0);
+                        toast.success('缓存已清空');
+                      }
+                    }}
+                  >
+                    🗑 清空缓存
+                  </button>
                 </div>
                 <div className="zhihu-ai-config-item">
                   <button type="button" className="zhihu-ai-config-save" onClick={handleSaveSettings}>

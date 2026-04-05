@@ -33,7 +33,6 @@ export class APIClient {
   private apiKey: string = '';
   private apiUrl: string = 'https://api.openai.com/v1/chat/completions';
   private model: string = 'gpt-4o-mini';
-  private maxTokens: number = 0;
 
   // Expose model property for UI components
   get modelName(): string {
@@ -63,7 +62,6 @@ export class APIClient {
         }
       }
     }
-    this.maxTokens = 0;
   }
 
   private generatePrompt(content: ExtractedContent): string {
@@ -89,8 +87,8 @@ export class APIClient {
         },
         body: JSON.stringify({
           model,
-          messages: [{ role: 'user', content: '测试连接' }],
-          max_tokens: 10,
+          messages: [{ role: 'user', content: '今天北京天气怎么样？' }],
+          max_tokens: 200,
           stream: false,
         }),
       });
@@ -141,7 +139,6 @@ export class APIClient {
             },
             { role: 'user', content: this.generatePrompt(content) },
           ],
-          max_tokens: this.maxTokens,
           stream: true,
         }),
       });

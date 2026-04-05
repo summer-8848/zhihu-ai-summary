@@ -4,7 +4,7 @@ import { StorageAdapter } from '@zhihu-ai-summary/core';
 export class ExtensionStorage implements StorageAdapter {
   async get<T>(key: string, defaultValue?: T): Promise<T> {
     return new Promise((resolve) => {
-      chrome.storage.sync.get({ [key]: defaultValue }, (result) => {
+      chrome.storage.local.get({ [key]: defaultValue }, (result) => {
         resolve(result[key] as T);
       });
     });
@@ -12,7 +12,9 @@ export class ExtensionStorage implements StorageAdapter {
 
   async set<T>(key: string, value: T): Promise<void> {
     return new Promise((resolve) => {
-      chrome.storage.sync.set({ [key]: value }, resolve);
+      chrome.storage.local.set({ [key]: value }, () => {
+        resolve();
+      });
     });
   }
 }

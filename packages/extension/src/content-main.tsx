@@ -84,6 +84,7 @@ export function runZhihuContentScript() {
         type={type}
         targetElement={targetElement}
         apiClient={apiClient}
+        configManager={configManager}
         authorName={options.authorName}
         autoTrigger={options.autoTrigger}
         minLength={options.minLength}

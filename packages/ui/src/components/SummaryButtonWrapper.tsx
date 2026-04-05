@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'preact/hooks';
-import { MarkdownFormatter, MarkdownParser, type APIClient, type ExtractedContent } from '@zhihu-ai-summary/core';
+import { useState, useEffect, useRef } from 'preact/hooks';
+import { MarkdownFormatter, MarkdownParser, type APIClient, type ExtractedContent, type ConfigManager } from '@zhihu-ai-summary/core';
 import { SummaryButton } from './SummaryButton';
 import { SummaryPanel } from './SummaryPanel';
 import { toast } from './Toast';
@@ -10,6 +10,7 @@ export interface SummaryButtonWrapperProps {
   type: 'article' | 'question' | 'answer';
   targetElement: Element;
   apiClient: APIClient;
+  configManager: ConfigManager;
   authorName?: string;
   autoTrigger?: boolean;
   minLength?: number;
@@ -22,6 +23,7 @@ export function SummaryButtonWrapper({
   type,
   targetElement,
   apiClient,
+  configManager,
   authorName,
   autoTrigger = false,
   minLength = 0,
@@ -34,6 +36,7 @@ export function SummaryButtonWrapper({
   const [streaming, setStreaming] = useState(false);
   const [sourceUrl, setSourceUrl] = useState(window.location.href);
   const [modelName, setModelName] = useState('AI');
+  const cacheSavedRef = useRef(false); // 防止重复保存缓存
 
   const hideSideColumn = () => {
     if (type !== 'answer') {
@@ -72,6 +75,7 @@ export function SummaryButtonWrapper({
   };
 
   const startSummarize = async (isManualClick: boolean = true) => {
+    cacheSavedRef.current = false;
     const restoreSideColumn = hideSideColumn();
     setShowPanel(true);
     setLoading(true);
@@ -80,13 +84,16 @@ export function SummaryButtonWrapper({
     const model = apiClient.modelName || 'AI';
     setModelName(model);
 
+    // 提取 answerUrl（用于缓存键）
+    let answerUrl = sourceUrl;
     if (type === 'answer') {
       const answerItem = targetElement.closest('.ContentItem.AnswerItem');
       if (answerItem) {
         const metaUrls = answerItem.querySelectorAll('meta[itemprop="url"]');
         const metaUrl = metaUrls.length > 1 ? metaUrls[1] : null;
         if (metaUrl && (metaUrl as HTMLMetaElement).content && (metaUrl as HTMLMetaElement).content.includes('/answer/')) {
-          setSourceUrl((metaUrl as HTMLMetaElement).content);
+          answerUrl = (metaUrl as HTMLMetaElement).content;
+          setSourceUrl(answerUrl);
         }
       }
     }
@@ -102,6 +109,20 @@ export function SummaryButtonWrapper({
           setStreaming(false);
           return;
         }
+      }
+
+      // 基于 URL + 类型生成缓存键
+      const cacheKey = `${answerUrl}:${type}`;
+      const cached = await configManager.getCachedSummary(cacheKey);
+
+      if (cached) {
+        const cachedHtml = MarkdownParser.parse(cached.markdown);
+        setMarkdown(cached.markdown);
+        setHtml(cachedHtml);
+        setLoading(false);
+        setStreaming(false);
+        restoreSideColumn();
+        return;
       }
 
       let fullMarkdown = '';
@@ -121,14 +142,27 @@ export function SummaryButtonWrapper({
             .replace(/\n/g, '<br>');
           setHtml(`<div style="white-space: pre-wrap;">${escaped}</div>`);
         },
-        () => {
+        async () => {
           const fullText = authorPrefix + fullMarkdown;
           const formatted = MarkdownFormatter.format(fullText);
           setMarkdown(formatted);
-          setHtml(MarkdownParser.parse(formatted));
+          const parsedHtml = MarkdownParser.parse(formatted);
+          setHtml(parsedHtml);
           setLoading(false);
           setStreaming(false);
           restoreSideColumn();
+          // 保存到缓存（只存 markdown，HTML 读取时动态生成）
+          if (!cacheSavedRef.current) {
+            cacheSavedRef.current = true;
+            try {
+              await configManager.setCachedSummary(cacheKey, {
+                markdown: formatted,
+                timestamp: Date.now(),
+              });
+            } catch (e) {
+              console.error('保存缓存失败:', e);
+            }
+          }
         },
         (error) => {
           setHtml(`<div class="zhihu-ai-inline-error">${error.message}</div>`);
