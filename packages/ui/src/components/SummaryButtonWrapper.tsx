@@ -36,6 +36,7 @@ export function SummaryButtonWrapper({
   const [streaming, setStreaming] = useState(false);
   const [sourceUrl, setSourceUrl] = useState(window.location.href);
   const [modelName, setModelName] = useState('AI');
+  const [cachedAt, setCachedAt] = useState<number | undefined>();
   const cacheSavedRef = useRef(false); // 防止重复保存缓存
 
   const hideSideColumn = () => {
@@ -80,6 +81,7 @@ export function SummaryButtonWrapper({
     setShowPanel(true);
     setLoading(true);
     setStreaming(true);
+    setCachedAt(undefined); // 开始新总结时清除缓存时间标记
 
     const model = apiClient.modelName || 'AI';
     setModelName(model);
@@ -119,6 +121,7 @@ export function SummaryButtonWrapper({
         const cachedHtml = MarkdownParser.parse(cached.markdown);
         setMarkdown(cached.markdown);
         setHtml(cachedHtml);
+        setCachedAt(cached.timestamp);
         setLoading(false);
         setStreaming(false);
         restoreSideColumn();
@@ -216,6 +219,7 @@ export function SummaryButtonWrapper({
           sourceUrl={sourceUrl}
           loading={loading}
           streaming={streaming}
+          cachedAt={cachedAt}
           onClose={() => setShowPanel(false)}
           onRefresh={() => startSummarize(true)}
           title={titleMap[type]}

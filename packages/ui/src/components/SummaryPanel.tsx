@@ -11,6 +11,7 @@ interface SummaryPanelProps {
   sourceUrl?: string;
   loading?: boolean;
   streaming?: boolean;
+  cachedAt?: number;
   onClose: () => void;
   onRefresh?: () => void;
   className?: string;
@@ -25,6 +26,7 @@ export function SummaryPanel({
   sourceUrl,
   loading,
   streaming,
+  cachedAt,
   onClose,
   onRefresh,
   className = '',
@@ -34,6 +36,18 @@ export function SummaryPanel({
 }: SummaryPanelProps) {
   const [copied, setCopied] = useState(false);
   const [dragging, setDragging] = useState(false);
+
+  // 格式化缓存时间
+  const formatCachedTime = (timestamp: number): string => {
+    const diff = Date.now() - timestamp;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (minutes < 1) return '刚刚';
+    if (minutes < 60) return `${minutes}分钟前`;
+    if (hours < 24) return `${hours}小时前`;
+    return `${days}天前`;
+  };
   const panelRef = useRef<PanelElement>(null);
   const originalParentRef = useRef<Element | null>(null);
   const contentCheckIntervalRef = useRef<number | null>(null);
@@ -491,6 +505,11 @@ export function SummaryPanel({
         </div>
 
         <div className="zhihu-ai-answer-result-body">
+          {cachedAt && (
+            <div style={{ fontSize: '12px', color: '#999', padding: '4px 0', marginBottom: '4px', borderBottom: '1px solid #eee' }}>
+              来自缓存 · {formatCachedTime(cachedAt)}
+            </div>
+          )}
           {!content && loading ? (
             <div className="zhihu-ai-inline-loading">
               <div className="zhihu-ai-inline-spinner"></div>
