@@ -11,7 +11,7 @@ interface ConfigModalProps {
   onClose: () => void;
 }
 
-type TabType = 'accounts' | 'settings';
+type TabType = 'data' | 'accounts' | 'settings';
 
 export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalProps) {
   // 从环境变量获取平台信息
@@ -254,11 +254,19 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
           <div className="zhihu-ai-tabs">
             <button
               type="button"
+              className={`zhihu-ai-tab ${activeTab === 'data' ? 'active' : ''}`}
+              onClick={() => setActiveTab('data')}
+              onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('data'))}
+            >
+              配置
+            </button>
+            <button
+              type="button"
               className={`zhihu-ai-tab ${activeTab === 'accounts' ? 'active' : ''}`}
               onClick={() => setActiveTab('accounts')}
               onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('accounts'))}
             >
-              账号管理
+              账号
             </button>
             <button
               type="button"
@@ -266,7 +274,7 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
               onClick={() => setActiveTab('settings')}
               onKeyDown={(e) => handleKeyDownActivate(e as unknown as KeyboardEvent, () => setActiveTab('settings'))}
             >
-              基础设置
+              设置
             </button>
           </div>
 
@@ -348,38 +356,12 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
             </div>
           )}
 
-          {activeTab === 'settings' && (
+          {activeTab === 'data' && (
             <div className="zhihu-ai-tab-content active">
               <div className="zhihu-ai-config-panel">
                 <div className="zhihu-ai-config-item">
-                  <label className="zhihu-ai-config-label" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={autoSummarize}
-                      onChange={(e) => setAutoSummarize((e.target as HTMLInputElement).checked)}
-                      style={{ marginRight: '8px', width: '18px', height: '18px', cursor: 'pointer' }}
-                    />
-                    <span>自动总结(页面加载后自动调用AI总结文章和问题中的各个回答)</span>
-                  </label>
-                </div>
-                <div className="zhihu-ai-config-item">
-                  <label className="zhihu-ai-config-label" htmlFor="zhihu-ai-min-answer-length">回答最少字数:</label>
-                  <input
-                    type="number"
-                    className="zhihu-ai-config-input"
-                    id="zhihu-ai-min-answer-length"
-                    value={minAnswerLength}
-                    min="0"
-                    placeholder="200"
-                    style={{ width: '100%' }}
-                    onInput={(e) => setMinAnswerLength(parseInt((e.target as HTMLInputElement).value) || 200)}
-                  />
-                  <div style={{ marginTop: '6px', fontSize: '12px', color: '#666' }}>
-                    回答字数少于此值时,不自动总结,仅显示提示信息(手动点击仍可总结)
-                  </div>
-                </div>
-                <div className="zhihu-ai-config-item">
-                  <div className="zhihu-ai-config-btn-group">
+                  <div className="zhihu-ai-config-label">导入导出配置</div>
+                  <div className="zhihu-ai-config-btn-group" style={{ marginTop: '8px' }}>
                     <button
                       type="button"
                       className="zhihu-ai-config-btn-half zhihu-ai-config-btn-secondary"
@@ -395,55 +377,112 @@ export function ConfigModal({ configManager, apiClient, onClose }: ConfigModalPr
                       📥 导入配置
                     </button>
                   </div>
+                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                    导入配置将覆盖现有设置，确定要继续吗？
+                  </div>
                 </div>
-                <div className="zhihu-ai-config-item">
-                  <label className="zhihu-ai-config-label" htmlFor="zhihu-ai-cache-size">缓存条数:</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="zhihu-ai-tab-content active">
+              <div className="zhihu-ai-config-panel" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+                {/* 区块1: 自动总结 - 带边框的卡片 */}
+                <div style={{ border: '1px solid #e5e5e5', borderRadius: '8px', padding: '16px', background: '#fff' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', marginBottom: '12px' }}>自动总结</div>
+                  <div className="zhihu-ai-config-item" style={{ marginBottom: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px' }}>
+                      <input
+                        type="checkbox"
+                        checked={autoSummarize}
+                        onChange={(e) => setAutoSummarize((e.target as HTMLInputElement).checked)}
+                      />
+                      <span style={{ fontSize: '13px', color: '#333' }}>自动总结</span>
+                    </label>
+                    <div style={{ fontSize: '12px', color: '#666', marginTop: '4px', marginLeft: '24px' }}>
+                      页面加载后自动调用AI总结文章和问题中的各个回答
+                    </div>
+                  </div>
+                  <div className="zhihu-ai-config-item" style={{ marginBottom: 0 }}>
+                    <label style={{ fontSize: '13px', color: '#333', marginBottom: '6px', display: 'block' }}>回答最少字数</label>
                     <input
                       type="number"
                       className="zhihu-ai-config-input"
-                      id="zhihu-ai-cache-size"
-                      value={cacheSize}
+                      value={minAnswerLength}
                       min="0"
-                      max="1000"
-                      style={{ width: '100px' }}
-                      onInput={(e) => setCacheSize(parseInt((e.target as HTMLInputElement).value) || 100)}
+                      placeholder="200"
+                      style={{ width: '100%', fontSize: '13px', padding: '8px 10px' }}
+                      onInput={(e) => setMinAnswerLength(parseInt((e.target as HTMLInputElement).value) || 200)}
                     />
-                    <span style={{ fontSize: '12px', color: '#666' }}>条（已缓存 {cacheCount} 条，共 {cacheStorageSize}）</span>
+                    <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                      回答字数少于此值时不自动总结
+                    </div>
                   </div>
-                  <div style={{ marginTop: '6px', fontSize: '12px', color: '#666' }}>
-                    缓存已总结的结果，下次访问相同内容时直接显示
-                  </div>
-                  <button
-                    type="button"
-                    className="zhihu-ai-config-btn-half zhihu-ai-config-btn-warning"
-                    style={{ marginTop: '8px' }}
-                    onClick={async () => {
-                      const ok = await confirm({
-                        title: '清空缓存',
-                        message: `确定要清空所有已缓存的 ${cacheCount} 条总结结果吗？`,
-                        confirmText: '清空',
-                        cancelText: '取消',
-                        danger: true,
-                      });
-                      if (ok) {
-                        await configManager.clearCache();
-                        setCacheCount(0);
-                        toast.success('缓存已清空');
-                      }
-                    }}
-                  >
-                    🗑 清空缓存
-                  </button>
                 </div>
+
+                {/* 区块2: 缓存管理 - 带边框的卡片 */}
+                <div style={{ border: '1px solid #e5e5e5', borderRadius: '8px', padding: '16px', background: '#fff' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#1a1a1a', marginBottom: '12px' }}>缓存</div>
+                  <div className="zhihu-ai-config-item" style={{ marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <label style={{ fontSize: '13px', color: '#333' }}>最大条数</label>
+                        <input
+                          type="number"
+                          className="zhihu-ai-config-input"
+                          value={cacheSize}
+                          min="0"
+                          max="1000"
+                          style={{ width: '80px', fontSize: '13px', padding: '6px 8px' }}
+                          onInput={(e) => setCacheSize(parseInt((e.target as HTMLInputElement).value) || 100)}
+                        />
+                      </div>
+                      <span style={{ fontSize: '12px', color: '#666' }}>
+                        已缓存 {cacheCount} 条 ({cacheStorageSize})
+                      </span>
+                      <button
+                        type="button"
+                        className="zhihu-ai-config-btn zhihu-ai-config-btn-warning"
+                        style={{ padding: '4px 12px', fontSize: '12px' }}
+                        onClick={async () => {
+                          const ok = await confirm({
+                            title: '清空缓存',
+                            message: `确定要清空所有已缓存的 ${cacheCount} 条总结结果吗？`,
+                            confirmText: '清空',
+                            cancelText: '取消',
+                            danger: true,
+                          });
+                          if (ok) {
+                            await configManager.clearCache();
+                            setCacheCount(0);
+                            setCacheStorageSize('0 B');
+                            toast.success('缓存已清空');
+                          }
+                        }}
+                      >
+                        清空缓存
+                      </button>
+                    </div>
+                  </div>
+                  <div className="zhihu-ai-config-item" style={{ marginBottom: 0 }}>
+                    <div style={{ fontSize: '12px', color: '#666' }}>
+                      缓存已总结的结果，下次访问相同内容时直接显示
+                    </div>
+                  </div>
+                </div>
+
+                {/* 保存按钮 */}
                 <div className="zhihu-ai-config-item">
-                  <button type="button" className="zhihu-ai-config-save" onClick={handleSaveSettings}>
+                  <button type="button" className="zhihu-ai-config-save" onClick={handleSaveSettings} style={{ width: '100%', padding: '12px', fontSize: '14px' }}>
                     保存设置
                   </button>
                 </div>
               </div>
             </div>
           )}
+
         </div>
       </div>
     </div>
