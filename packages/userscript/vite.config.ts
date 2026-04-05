@@ -25,7 +25,7 @@ export default defineConfig({
         version: version,
         description: '知乎中的文章、问题和回答提供 AI 智能总结功能',
         author: author,
-        match: ['https://*.zhihu.com/*'],
+        match: ['https://zhuanlan.zhihu.com/p/*', 'https://www.zhihu.com/question/*'],
         grant: ['GM_xmlhttpRequest', 'GM_setValue', 'GM_getValue', 'unsafeWindow'],
         license: 'MIT',
         connect: ['localhost', '*'],
